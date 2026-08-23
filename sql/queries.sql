@@ -1,0 +1,5 @@
+-- Kumpulan query analisis: skor RFM (NTILE), jarak antar-order (LAG),
+-- rata-rata monetary & retention per cohort (CTE bertingkat), dan self-join
+-- order pertama vs order berikutnya per customer.
+--
+-- TODO: query belum ditulis (tahap scaffolding).

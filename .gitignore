@@ -1,0 +1,19 @@
+# Data mentah & hasil olahan — tidak pernah dicommit (soal ukuran repo)
+data/*
+!data/raw/
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/SUMBER_DATA.md
+
+# Virtual environment
+venv/
+
+# Dashboard Power BI (binary besar)
+*.pbix
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
