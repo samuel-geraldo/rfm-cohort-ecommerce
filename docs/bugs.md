@@ -43,3 +43,37 @@ Setiap bug nyata yang ditemukan selama pengerjaan dicatat di sini dengan format:
   hasilnya kolom flat (`pd.Index`, bukan `MultiIndex`). Ditambah `assert not
   isinstance(cohort_matrix.columns, pd.MultiIndex)` di `03_cohort.py` supaya
   kalau regresi lagi langsung ketahuan, bukan salah baca kolom diam-diam.
+
+## F_score beda ~24% antara `NTILE(5)` (SQL) dan `qcut`+`rank` (Python)
+
+- **Gejala:** Validasi silang `sql/queries.sql` vs `output/rfm_table.csv`
+  (`src/02_rfm.py`): nilai mentah Recency/Frequency/Monetary cocok 100% per
+  customer (logika agregasinya benar di kedua sisi). Tapi F_score cuma cocok
+  76.22% (1,394 dari 5,861 customer beda, semua selisih tepat ±1 — tidak ada
+  yang beda 2+). R_score cocok 99.25% (44 beda, juga ±1). M_score cocok
+  100%.
+- **Penyebab:** Frequency sangat menumpuk di nilai kecil (1,625 customer
+  dengan Frequency=1, 945 dengan Frequency=2, dst. — jauh lebih dari 1/5
+  populasi per nilai), sama seperti yang sudah diantisipasi di bug watchlist
+  soal `qcut` "Bin edges must be unique". Baik `NTILE(5) OVER (ORDER BY
+  Frequency ASC)` (SQL) maupun `qcut(rank(method='first'))` (Python) harus
+  memotong paksa blok nilai yang identik ini supaya ukuran quintile rata,
+  tapi keduanya pakai urutan tie-break yang berbeda: SQLite mengurutkan
+  baris yang Frequency-nya sama pakai urutan implisit (rowid/urutan insert
+  dari parquet, ~urutan transaksi), sedangkan pandas `rank(method='first')`
+  memakai urutan baris DataFrame (~urutan CustomerID, karena `groupby`
+  sort by key). Customer yang persis di garis batas quintile jadi jatuh ke
+  bucket berbeda tergantung urutan tie-break yang dipakai. R_score juga
+  kena efek serupa tapi lebih kecil (Recency lebih jarang tie persis).
+  M_score nyaris tidak kena karena Monetary hampir kontinu (jarang ada
+  angka Revenue total yang identik persis antar customer).
+- **Solusi:** Bukan bug yang perlu "diperbaiki" — kedua sisi sama-sama
+  quintile yang valid untuk data dengan tie sebanyak ini, cuma beda pilihan
+  tie-break yang keduanya arbitrer (tidak ada satu urutan tie-break yang
+  "benar"). Diverifikasi selisihnya selalu ±1 (bukan ±2 atau lebih) untuk
+  memastikan ini murni pergeseran batas quintile, bukan salah hitung.
+  Kesimpulan: pakai `output/rfm_table.csv` (Python) sebagai sumber
+  kebenaran untuk Segment & dashboard (karena itu yang sudah dipipeline ke
+  README/Power BI); `sql/queries.sql` tetap berguna sebagai validasi
+  independen atas Recency/Frequency/Monetary mentah (yang cocok 100%), dan
+  sebagai demonstrasi teknik `NTILE()` window function.

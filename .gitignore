@@ -8,6 +8,9 @@ data/raw/*
 # Virtual environment
 venv/
 
+# Database SQLite hasil generate (build artifact dari data/processed, besar)
+sql/retail.db
+
 # Dashboard Power BI (binary besar)
 *.pbix
 
