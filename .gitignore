@@ -20,3 +20,6 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Konfigurasi lokal Claude Code
+.claude/
