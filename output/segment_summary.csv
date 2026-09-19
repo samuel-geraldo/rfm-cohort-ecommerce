@@ -1,0 +1,11 @@
+Segment,Jumlah_customer,Rata2_recency,Rata2_frequency,Rata2_monetary,Total_monetary,Persen_customer,Persen_monetary
+Champions,830,8.03,19.27,10597.05,8795548.47,14.16,51.52
+Loyal Customers,1157,66.05,9.73,4028.38,4660837.75,19.74,27.3
+At Risk,756,372.31,3.89,1337.58,1011207.33,12.9,5.92
+Potential Loyalists,711,25.2,2.58,1137.97,809098.37,12.13,4.74
+Hibernating,1515,457.65,1.25,408.51,618885.97,25.85,3.62
+Can't Lose,73,326.81,16.3,7958.38,580961.6,1.25,3.4
+Need Attention,269,112.07,3.13,1251.11,336549.48,4.59,1.97
+About To Sleep,382,105.56,1.36,537.59,205357.91,6.52,1.2
+Promising,114,37.78,1.0,314.32,35832.04,1.95,0.21
+New Customers,54,9.93,1.0,348.14,18799.37,0.92,0.11
