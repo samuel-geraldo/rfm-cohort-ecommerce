@@ -33,6 +33,7 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
 .sub { color: var(--ink2); margin: 2px 0 0; font-size: 12px; }
 button, select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
 button:hover, select:hover { background: var(--wash); }
+select:disabled, label.mati { opacity: .45; cursor: not-allowed; }
 button:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); flex: 1 1 auto; }
@@ -115,6 +116,8 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
 
   <p class="note" id="catatan-churn" hidden>Pada status churn, segmen dengan Recency tinggi (Champions, Potential Loyalists, Promising, New Customers) memang tidak muncul: churn berarti tidak belanja lebih dari 180 hari, dan segmen itu dibentuk dari pelanggan yang baru belanja.</p>
 
+  <p class="note" id="catatan-cohort" hidden>Filter wilayah dan status tidak berlaku di halaman ini. Angka cohort sudah dirata-rata per bulan pembelian pertama, jadi tidak bisa dipecah per pelanggan. Status churn juga tidak cocok dipakai di sini: churn ditentukan dari belanja terakhir, sehingga memecah cohort menurut status itu melingkar.</p>
+
   <!-- Halaman 1: gambaran besar -->
   <main class="page p1 on" id="ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
     <div class="card hero">
@@ -170,7 +173,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
       <h2>Cohort retention heatmap</h2>
       <p class="cap">Baris: bulan pembelian pertama. Kolom: bulan ke-n sesudahnya. Sel kosong berarti belum ada data. Skala 0 sampai 50%.</p>
       <div id="heat-grafik"></div>
-      <p class="note">Data cohort tidak tersedia per pelanggan, jadi halaman ini tidak ikut filter. Nilai tiap sel ada di output/cohort_matrix.csv.</p>
+      <p class="note">Nilai tiap sel ada di output/cohort_matrix.csv.</p>
     </section>
   </main>
   <footer>Sumber: UCI Online Retail II. Nilai dalam pound sterling. Dibangun oleh src/06_dashboard.py dari file di output/.</footer>
@@ -421,6 +424,9 @@ function bukaHalaman(nama, fokus) {
     $(h).classList.toggle("on", h === nama);
     const tab = $("tab-" + h); tab.setAttribute("aria-selected", String(h === nama)); tab.tabIndex = h === nama ? 0 : -1;
   });
+  const tanpaFilter = nama === "cohort";
+  ["f-wilayah", "f-status"].forEach((id) => { $(id).disabled = tanpaFilter; $(id).parentElement.classList.toggle("mati", tanpaFilter); });
+  $("catatan-cohort").hidden = !tanpaFilter;
   try { history.replaceState(null, "", "#" + nama); } catch (e) { /* file:// tertentu menolak */ }
   if (fokus) $("tab-" + nama).focus();
   semua();
