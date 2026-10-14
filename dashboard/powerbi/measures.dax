@@ -8,6 +8,13 @@ Total Revenue = SUM ( customers[Monetary] )
 
 Avg Order Value = AVERAGE ( customers[AvgOrderValue] )
 
+// Rata-rata per pelanggan, dipakai di tabel rincian segmen
+Avg Recency = AVERAGE ( customers[Recency] )
+
+Avg Frequency = AVERAGE ( customers[Frequency] )
+
+Avg Monetary = AVERAGE ( customers[Monetary] )
+
 Churn Rate =
 DIVIDE (
     CALCULATE ( [Customers], customers[ChurnStatus] = "Churned" ),

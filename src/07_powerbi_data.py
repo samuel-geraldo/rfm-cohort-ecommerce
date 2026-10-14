@@ -64,6 +64,10 @@ acuan = {
     "aov_churn": customers.loc[customers["ChurnStatus"] == "Churned", "AvgOrderValue"].mean(),
     "aov_uk": customers.loc[customers["Region"] == "UK", "AvgOrderValue"].mean(),
     "aov_luar": customers.loc[customers["Region"] == "Non-UK", "AvgOrderValue"].mean(),
+    "frq_uk": customers.loc[customers["Region"] == "UK", "Frequency"].mean(),
+    "frq_luar": customers.loc[customers["Region"] == "Non-UK", "Frequency"].mean(),
+    "churn_uk": (customers.loc[customers["Region"] == "UK", "ChurnStatus"] == "Churned").mean() * 100,
+    "churn_luar": (customers.loc[customers["Region"] == "Non-UK", "ChurnStatus"] == "Churned").mean() * 100,
     "ret_1": rata_bulan.loc[1, "mean"], "ret_1_n": int(rata_bulan.loc[1, "count"]),
     "ret_6": rata_bulan.loc[6, "mean"], "ret_6_n": int(rata_bulan.loc[6, "count"]),
     "ret_24_n": int(rata_bulan.loc[24, "count"]),
@@ -74,6 +78,7 @@ assert round(acuan["share_champions"], 2) == 51.52
 assert round(acuan["persen_churn"], 2) == 40.73
 assert round(acuan["ret_1"], 2) == 20.99 and acuan["ret_1_n"] == 24
 assert round(acuan["ret_6"], 2) == 17.88 and acuan["ret_6_n"] == 19
+assert (round(acuan["frq_uk"], 2), round(acuan["frq_luar"], 2)) == (6.26, 6.19)
 assert round(acuan["aov_aktif"], 2) == 407.81 and round(acuan["aov_churn"], 2) == 340.81
 
 # --- measures.dax ---
@@ -87,6 +92,13 @@ Customers = DISTINCTCOUNT ( customers[CustomerID] )
 Total Revenue = SUM ( customers[Monetary] )
 
 Avg Order Value = AVERAGE ( customers[AvgOrderValue] )
+
+// Rata-rata per pelanggan, dipakai di tabel rincian segmen
+Avg Recency = AVERAGE ( customers[Recency] )
+
+Avg Frequency = AVERAGE ( customers[Frequency] )
+
+Avg Monetary = AVERAGE ( customers[Monetary] )
 
 Churn Rate =
 DIVIDE (
@@ -166,24 +178,49 @@ Di Data view, pilih kolom `segments[Segment]`, lalu **Sort by column** > `SortOr
 - **View > Themes > Browse for themes** > pilih `theme.json`.
 - Tempel measure dari [`measures.dax`](measures.dax) satu per satu lewat **New measure**.
 
-## 3. Susun satu halaman
+## 3. Susun tiga halaman
+
+Tata letaknya sama dengan dashboard HTML (`dashboard/customer_analytics.html`): landscape,
+tiap halaman satu fokus. Buat tiga halaman dan beri nama **Ringkasan**,
+**Segmen dan wilayah**, **Cohort retention**. Letakkan slicer `customers[Region]` dan
+`customers[ChurnStatus]` di halaman pertama, lalu salin ke halaman 2 lewat
+**View > Sync slicers**.
+
+### Halaman 1: Ringkasan
 
 | Visual | Field | Catatan |
 |---|---|---|
-| Slicer (dropdown) | `customers[Region]` | filter wilayah |
-| Slicer (dropdown) | `customers[ChurnStatus]` | filter status |
 | Card (besar) | `[Champions Revenue Share]` | angka utama, ukuran font 48 ke atas |
 | Card | `[Customers]` | |
 | Card | `[Total Revenue]` | format £ |
 | Card | `[Avg Order Value]` | format £ |
 | Card | `[Churn Rate]` | format persen |
-| Clustered bar | sumbu: `segments[Segment]`, nilai: `[Revenue Share]` | urutkan menurun menurut `[Revenue Share]`; warnai Champions dengan biru `#2a78d6`, segmen lain abu-abu (Format > Bars > Colors > fx) |
+| Clustered bar | sumbu: `segments[Segment]`, nilai: `[Revenue Share]` | urutkan menurun menurut `[Revenue Share]`; warnai Champions biru `#2a78d6`, segmen lain abu-abu (Format > Bars > Colors > fx) |
 | Clustered bar | sumbu: `customers[ChurnStatus]`, nilai: `[Avg Order Value]` | aktif dibanding churn |
+
+### Halaman 2: Segmen dan wilayah
+
+| Visual | Field | Catatan |
+|---|---|---|
+| Table | `segments[Segment]`, `[Customers]`, `[Customer Share]`, `[Revenue Share]`, `[Avg Recency]`, `[Avg Frequency]`, `[Avg Monetary]` | urutkan menurut `[Revenue Share]` menurun |
+| Clustered bar | sumbu: `customers[Region]`, nilai: `[Avg Order Value]` | Inggris dibanding luar Inggris |
+| Clustered bar | sumbu: `customers[Region]`, nilai: `[Avg Frequency]` | |
+| Clustered bar | sumbu: `customers[Region]`, nilai: `[Churn Rate]` | |
+
+Untuk tiga bar wilayah, matikan pengaruh slicer Region: pilih slicer Region, **Format >
+Edit interactions**, lalu klik ikon **None** di tiga visual itu. Halaman ini membandingkan
+kedua wilayah, jadi tidak boleh tersaring ke salah satunya. Slicer status tetap berlaku.
+
+### Halaman 3: Cohort retention
+
+| Visual | Field | Catatan |
+|---|---|---|
 | Line chart | sumbu: `cohort_retention[month_index]`, nilai: `[Avg Retention %]` | filter visual: `month_index` lebih besar dari 0; tambahkan `[Cohorts Averaged]` ke Tooltips |
 | Matrix | baris: `cohort_retention[cohort_month]`, kolom: `month_index`, nilai: `[Avg Retention %]` | Format > Cell elements > Background color > Gradient, minimum 0, maksimum 0,5 |
 
-Catatan membaca grafik retention: makin ke kanan, makin sedikit cohort yang ikut
-dirata-rata. Bulan ke-24 hanya berasal dari satu cohort.
+Halaman ini tidak punya slicer: tabel cohort tidak berelasi ke `customers`, jadi tidak
+tersaring. Makin ke kanan, makin sedikit cohort yang ikut dirata-rata. Bulan ke-24 hanya
+berasal dari satu cohort.
 
 ## 4. Periksa dengan angka acuan
 
@@ -198,6 +235,8 @@ Dengan semua slicer kosong, measure harus menghasilkan:
 | `[Avg Order Value]` | {a["aov_semua"]:.2f} |
 | `[Avg Order Value]` untuk Active / Churned | {a["aov_aktif"]:.2f} / {a["aov_churn"]:.2f} |
 | `[Avg Order Value]` dengan Region = UK / Non-UK | {a["aov_uk"]:.2f} / {a["aov_luar"]:.2f} |
+| `[Avg Frequency]` Region = UK / Non-UK | {a["frq_uk"]:.2f} / {a["frq_luar"]:.2f} |
+| `[Churn Rate]` Region = UK / Non-UK | {a["churn_uk"]:.2f}% / {a["churn_luar"]:.2f}% |
 | `[Avg Retention %]` bulan ke-1 | {a["ret_1"]:.2f}% dari {a["ret_1_n"]} cohort |
 | `[Avg Retention %]` bulan ke-6 | {a["ret_6"]:.2f}% dari {a["ret_6_n"]} cohort |
 | `[Cohorts Averaged]` bulan ke-24 | {a["ret_24_n"]} |
