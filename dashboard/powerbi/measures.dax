@@ -1,0 +1,41 @@
+// Tempel satu per satu: Model view > tabel customers > New measure.
+// Measure retention ditaruh di tabel cohort_retention.
+
+// ===== Tabel customers =====
+Customers = DISTINCTCOUNT ( customers[CustomerID] )
+
+Total Revenue = SUM ( customers[Monetary] )
+
+Avg Order Value = AVERAGE ( customers[AvgOrderValue] )
+
+Churn Rate =
+DIVIDE (
+    CALCULATE ( [Customers], customers[ChurnStatus] = "Churned" ),
+    [Customers]
+)
+
+// Persen omzet satu segmen dari total omzet pada slicer yang aktif
+Revenue Share =
+DIVIDE (
+    [Total Revenue],
+    CALCULATE ( [Total Revenue], REMOVEFILTERS ( customers[Segment] ) )
+)
+
+Customer Share =
+DIVIDE (
+    [Customers],
+    CALCULATE ( [Customers], REMOVEFILTERS ( customers[Segment] ) )
+)
+
+// Angka besar di kartu utama
+Champions Revenue Share =
+CALCULATE ( [Revenue Share], customers[Segment] = "Champions" )
+
+Champions Customer Share =
+CALCULATE ( [Customer Share], customers[Segment] = "Champions" )
+
+// ===== Tabel cohort_retention =====
+// Baris kosong sudah dibuang di CSV, jadi AVERAGE hanya menghitung cohort yang punya data
+Avg Retention % = AVERAGE ( cohort_retention[retention_pct] ) / 100
+
+Cohorts Averaged = DISTINCTCOUNT ( cohort_retention[cohort_month] )
