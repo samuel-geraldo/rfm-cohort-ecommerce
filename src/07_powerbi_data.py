@@ -106,6 +106,14 @@ DIVIDE (
     [Customers]
 )
 
+// Persen churn terhadap semua pelanggan di wilayah yang dipilih, tanpa memedulikan slicer status.
+// Dipakai di kartu: kalau slicer status ikut berlaku, hasilnya selalu 100% (Churned) atau 0% (Active).
+Churn Rate (Region) =
+DIVIDE (
+    CALCULATE ( [Customers], customers[ChurnStatus] = "Churned", REMOVEFILTERS ( customers[ChurnStatus] ) ),
+    CALCULATE ( [Customers], REMOVEFILTERS ( customers[ChurnStatus] ) )
+)
+
 // Persen omzet satu segmen dari total omzet pada slicer yang aktif
 Revenue Share =
 DIVIDE (
@@ -194,9 +202,15 @@ tiap halaman satu fokus. Buat tiga halaman dan beri nama **Ringkasan**,
 | Card | `[Customers]` | |
 | Card | `[Total Revenue]` | format £ |
 | Card | `[Avg Order Value]` | format £ |
-| Card | `[Churn Rate]` | format persen |
+| Card | `[Churn Rate (Region)]` | format persen; pakai measure ini, bukan `[Churn Rate]`, supaya tidak jadi 100% saat slicer status = Churned |
 | Clustered bar | sumbu: `segments[Segment]`, nilai: `[Revenue Share]` | urutkan menurun menurut `[Revenue Share]`; warnai Champions biru `#2a78d6`, segmen lain abu-abu (Format > Bars > Colors > fx) |
 | Clustered bar | sumbu: `customers[ChurnStatus]`, nilai: `[Avg Order Value]` | aktif dibanding churn |
+
+Saat slicer `ChurnStatus` = Churned, `[Champions Revenue Share]` akan kosong atau 0 dan itu
+benar, bukan kesalahan measure. Churn berarti Recency lebih dari 180 hari, sedangkan Champions,
+Potential Loyalists, Promising, dan New Customers dibentuk dari pelanggan yang baru belanja,
+jadi tidak ada yang beririsan. Dashboard HTML menangani ini dengan menyorot segmen terbesar;
+di Power BI cukup tambahkan kotak teks yang menjelaskannya di dekat slicer.
 
 ### Halaman 2: Segmen dan wilayah
 
@@ -205,11 +219,11 @@ tiap halaman satu fokus. Buat tiga halaman dan beri nama **Ringkasan**,
 | Table | `segments[Segment]`, `[Customers]`, `[Customer Share]`, `[Revenue Share]`, `[Avg Recency]`, `[Avg Frequency]`, `[Avg Monetary]` | urutkan menurut `[Revenue Share]` menurun |
 | Clustered bar | sumbu: `customers[Region]`, nilai: `[Avg Order Value]` | Inggris dibanding luar Inggris |
 | Clustered bar | sumbu: `customers[Region]`, nilai: `[Avg Frequency]` | |
-| Clustered bar | sumbu: `customers[Region]`, nilai: `[Churn Rate]` | |
+| Clustered bar | sumbu: `customers[Region]`, nilai: `[Churn Rate (Region)]` | pakai measure ini supaya tidak ikut slicer status |
 
 Untuk tiga bar wilayah, matikan pengaruh slicer Region: pilih slicer Region, **Format >
 Edit interactions**, lalu klik ikon **None** di tiga visual itu. Halaman ini membandingkan
-kedua wilayah, jadi tidak boleh tersaring ke salah satunya. Slicer status tetap berlaku.
+kedua wilayah, jadi tidak boleh tersaring ke salah satunya. Slicer status tetap berlaku untuk order value dan frequency, tapi tidak untuk churn.
 
 ### Halaman 3: Cohort retention
 
@@ -231,7 +245,8 @@ Dengan semua slicer kosong, measure harus menghasilkan:
 | `[Customers]` | {a["jumlah_pelanggan"]:,} |
 | `[Total Revenue]` | {a["total_omzet"]:,.2f} |
 | `[Champions Revenue Share]` | {a["share_champions"]:.2f}% |
-| `[Churn Rate]` | {a["persen_churn"]:.2f}% |
+| `[Churn Rate]` dan `[Churn Rate (Region)]` | {a["persen_churn"]:.2f}% |
+| `[Churn Rate (Region)]` Region = UK, status apa pun | {a["churn_uk"]:.2f}% |
 | `[Avg Order Value]` | {a["aov_semua"]:.2f} |
 | `[Avg Order Value]` untuk Active / Churned | {a["aov_aktif"]:.2f} / {a["aov_churn"]:.2f} |
 | `[Avg Order Value]` dengan Region = UK / Non-UK | {a["aov_uk"]:.2f} / {a["aov_luar"]:.2f} |

@@ -113,6 +113,8 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
     </div>
   </div>
 
+  <p class="note" id="catatan-churn" hidden>Pada status churn, segmen dengan Recency tinggi (Champions, Potential Loyalists, Promising, New Customers) memang tidak muncul: churn berarti tidak belanja lebih dari 180 hari, dan segmen itu dibentuk dari pelanggan yang baru belanja.</p>
+
   <!-- Halaman 1: gambaran besar -->
   <main class="page p1 on" id="ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
     <div class="card hero">
@@ -123,7 +125,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
       <div class="card tile"><div class="lab">Pelanggan</div><div class="val" id="k-pel">-</div></div>
       <div class="card tile"><div class="lab">Total omzet</div><div class="val" id="k-omzet">-</div></div>
       <div class="card tile"><div class="lab">Rata-rata order value</div><div class="val" id="k-aov">-</div></div>
-      <div class="card tile"><div class="lab">Pelanggan churn</div><div class="val" id="k-churn">-</div></div>
+      <div class="card tile"><div class="lab">Pelanggan churn (di wilayah ini)</div><div class="val" id="k-churn">-</div></div>
     </div>
     <section class="card a">
       <h2>Kontribusi omzet per segmen</h2>
@@ -148,10 +150,10 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
     </section>
     <section class="card">
       <h2>Inggris dibanding luar Inggris</h2>
-      <p class="cap">Mengikuti filter status. Filter wilayah tidak dipakai di sini karena halaman ini membandingkan keduanya.</p>
+      <p class="cap">Order value dan frequency mengikuti filter status; persen churn selalu dihitung dari semua pelanggan. Filter wilayah tidak dipakai karena halaman ini membandingkan keduanya.</p>
       <div class="mini"><h3>Rata-rata order value</h3><div id="w-aov"></div></div>
       <div class="mini"><h3>Rata-rata frequency (jumlah invoice)</h3><div id="w-freq"></div></div>
-      <div class="mini"><h3>Pelanggan churn</h3><div id="w-churn"></div></div>
+      <div class="mini"><h3>Pelanggan churn (semua status)</h3><div id="w-churn"></div></div>
     </section>
   </main>
 
@@ -254,17 +256,26 @@ function gambarBar(wadah, items, opsi) {
 function ringkas() {
   const sub = subset(), n = sub.length;
   const omzet = sub.reduce((a, c) => a + c[IDX.rev], 0);
-  const churn = sub.filter((c) => c[IDX.churn] === 1).length;
   $("k-pel").textContent = fInt(n);
   $("k-omzet").textContent = fOmzet(omzet);
   $("k-aov").textContent = n ? "£" + fDes(rata(sub, IDX.aov)) : "-";
-  $("k-churn").textContent = n ? fPct(churn / n * 100) + " (" + fInt(churn) + ")" : "-";
-  const champ = sub.filter((c) => c[IDX.seg] === 0);
-  const pRev = omzet ? champ.reduce((a, c) => a + c[IDX.rev], 0) / omzet * 100 : 0;
-  $("hero-angka").textContent = fPct(pRev);
-  $("hero-teks").textContent = fPct(n ? champ.length / n * 100 : 0) + " pelanggan (" + fInt(champ.length) +
-    ", segmen Champions) menyumbang " + fPct(pRev) + " omzet pada filter ini.";
+  // Churn dihitung terhadap wilayah yang dipilih, bukan terhadap status: kalau status ikut
+  // difilter, hasilnya selalu 100% atau 0% dan tidak memberi informasi.
+  const wilayah = D.pelanggan.filter((c) => S.wilayah === "semua" || (S.wilayah === "uk") === (c[IDX.uk] === 1));
+  const churn = wilayah.filter((c) => c[IDX.churn] === 1).length;
+  $("k-churn").textContent = fPct(churn / wilayah.length * 100) + " (" + fInt(churn) + ")";
+  $("catatan-churn").hidden = S.status !== "churn" || halaman === "cohort";
   return { sub, n, omzet };
+}
+// Kartu utama menyorot Champions. Kalau Champions tidak ada pada filter (status churn berarti
+// Recency > 180 hari, mustahil jadi Champions), pindah ke segmen terbesar supaya tidak tampil 0%.
+function pilihSorotan(per) { return per.find((p) => p.i === 0 && p.n > 0) || per[0]; }
+function isiHero(per, sorot) {
+  $("hero-angka").textContent = fPct(sorot.pRev);
+  let teks = fPct(sorot.pPel) + " pelanggan (" + fInt(sorot.n) + ", segmen " + sorot.nama + ") menyumbang " +
+    fPct(sorot.pRev) + " omzet pada filter ini.";
+  if (sorot.i !== 0) teks += " Champions tidak ada pada filter ini, jadi yang disorot segmen terbesar.";
+  $("hero-teks").textContent = teks;
 }
 function ringkasanSegmen({ sub, n, omzet }) {
   return D.segmen.map((nama, i) => {
@@ -272,9 +283,9 @@ function ringkasanSegmen({ sub, n, omzet }) {
     return { nama, i, g, n: g.length, rev, pRev: omzet ? rev / omzet * 100 : 0, pPel: n ? g.length / n * 100 : 0 };
   }).sort((a, b) => b.pRev - a.pRev);
 }
-function gambarSegmenBar(per) {
+function gambarSegmenBar(per, sorot) {
   gambarBar($("seg-grafik"), per.map((p) => ({
-    nama: p.nama, nilai: p.pRev, warna: p.i === 0 ? css("--accent") : css("--soft"), label: fPct(p.pRev),
+    nama: p.nama, nilai: p.pRev, warna: p.i === sorot.i ? css("--accent") : css("--soft"), label: fPct(p.pRev),
     tip: [["Omzet", fPct(p.pRev)], ["Pelanggan", fInt(p.n) + " (" + fPct(p.pPel) + ")"]],
   })), { kiri: 130, maks: Math.max(...per.map((p) => p.pRev), 1), baris: 31, aria: "Kontribusi omzet per segmen pelanggan" });
 }
@@ -308,13 +319,16 @@ function gambarWilayah() {
   const dasar = D.pelanggan.filter((c) => S.status === "semua" || (S.status === "churn") === (c[IDX.churn] === 1));
   const grup = [["Inggris", dasar.filter((c) => c[IDX.uk] === 1), css("--accent")],
     ["Luar Inggris", dasar.filter((c) => c[IDX.uk] === 0), css("--soft")]];
+  // Persen churn dihitung dari semua status; kalau status ikut difilter hasilnya selalu 100% atau 0%.
+  const grupSemuaStatus = [D.pelanggan.filter((c) => c[IDX.uk] === 1), D.pelanggan.filter((c) => c[IDX.uk] === 0)];
   const ukuran = [
     ["w-aov", (g) => rata(g, IDX.aov), (v) => "£" + fDes(v), "Rata-rata order value"],
     ["w-freq", (g) => rata(g, IDX.frq), (v) => v.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 }), "Rata-rata frequency"],
     ["w-churn", (g) => g.filter((c) => c[IDX.churn] === 1).length / g.length * 100, fPct, "Pelanggan churn"],
   ];
   ukuran.forEach(([id, fn, fmt, nama]) => {
-    const item = grup.map(([n, g, w]) => ({ nama: n, nilai: g.length ? fn(g) : 0, warna: w, g }));
+    const item = grup.map(([n, g, w], j) => { const gg = id === "w-churn" ? grupSemuaStatus[j] : g;
+      return { nama: n, nilai: gg.length ? fn(gg) : 0, warna: w, g: gg }; });
     gambarBar($(id), item.map((it) => ({ nama: it.nama, nilai: it.nilai, warna: it.warna, label: fmt(it.nilai),
       tip: [[nama, fmt(it.nilai)], ["Pelanggan", fInt(it.g.length)]] })),
       { kiri: 100, maks: Math.max(...item.map((i) => i.nilai), 1), baris: 30, aria: nama + " Inggris dan luar Inggris" });
@@ -394,8 +408,10 @@ function gambarHeat() {
 let halaman = "ringkasan";
 function semua() {
   const r = ringkas(); // kartu angka selalu dihitung ulang
-  if (halaman === "ringkasan") { gambarSegmenBar(ringkasanSegmen(r)); gambarAov(); }
-  if (halaman === "segmen") { tabelSegmen(ringkasanSegmen(r)); gambarWilayah(); }
+  const per = ringkasanSegmen(r), sorot = pilihSorotan(per);
+  isiHero(per, sorot);
+  if (halaman === "ringkasan") { gambarSegmenBar(per, sorot); gambarAov(); }
+  if (halaman === "segmen") { tabelSegmen(per); gambarWilayah(); }
   if (halaman === "cohort") { gambarRetention(); gambarHeat(); }
 }
 function bukaHalaman(nama, fokus) {
