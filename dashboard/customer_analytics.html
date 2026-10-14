@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Customer Analytics Online Retail II</title>
+<title>RFM dan Cohort E-commerce</title>
 <style>
 :root {
   color-scheme: light;
@@ -47,6 +47,17 @@ button:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 
 .note { color: var(--ink2); font-size: 12px; margin: 8px 0 0; }
 .page { display: none; gap: 12px; }
 .page.on { display: grid; }
+.p0 { grid-template-columns: 1fr 1fr; }
+.p0 .guide { grid-column: 1 / -1; }
+.rfm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.rfm > div { border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.rfm .huruf { font-size: 26px; font-weight: 600; color: var(--accent); line-height: 1.1; }
+.rfm b { display: block; font-size: 13px; }
+.rfm span { color: var(--ink2); font-size: 12px; }
+.langkah { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.langkah button { text-align: left; padding: 10px 12px; }
+.langkah b { display: block; font-size: 13px; margin-bottom: 2px; }
+.langkah span { color: var(--ink2); font-size: 12px; }
 .p1 { grid-template-columns: 1fr 1fr 1fr; }
 .p1 .hero { grid-column: 1; }
 .p1 .tiles { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -82,7 +93,8 @@ tr.top td:first-child { color: var(--accent); font-weight: 600; }
 #tip .k { color: var(--ink2); }
 footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
 @media (max-width: 900px) {
-  .p1, .p2, .p3 { grid-template-columns: 1fr; }
+  .p0, .p1, .p2, .p3 { grid-template-columns: 1fr; }
+  .rfm, .langkah { grid-template-columns: 1fr; }
   .p1 .hero, .p1 .tiles, .p1 .a, .p1 .b { grid-column: 1; }
   .hero .big { font-size: 48px; }
 }
@@ -92,19 +104,20 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
 <div class="wrap">
   <header>
     <div>
-      <h1>Customer Analytics: RFM dan Cohort Retention</h1>
-      <p class="sub">Online Retail II, peritel online Inggris, Des 2009 sampai Des 2011</p>
+      <h1>E-commerce Customer Analytics: RFM Segmentation dan Cohort Retention</h1>
+      <p class="sub">Online Retail II: peritel online Inggris, 5.861 pelanggan, 1,07 juta baris transaksi, Des 2009 sampai Des 2011</p>
     </div>
     <button id="tema" type="button">Ganti tema</button>
   </header>
 
   <div class="bar">
     <div class="tabs" role="tablist" aria-label="Halaman dashboard">
-      <button type="button" role="tab" id="tab-ringkasan" aria-selected="true" aria-controls="ringkasan" data-hal="ringkasan">1. Ringkasan</button>
+      <button type="button" role="tab" id="tab-pengantar" aria-selected="true" aria-controls="pengantar" data-hal="pengantar">Mulai di sini</button>
+      <button type="button" role="tab" id="tab-ringkasan" aria-selected="false" aria-controls="ringkasan" data-hal="ringkasan" tabindex="-1">1. Ringkasan</button>
       <button type="button" role="tab" id="tab-segmen" aria-selected="false" aria-controls="segmen" data-hal="segmen" tabindex="-1">2. Segmen dan wilayah</button>
       <button type="button" role="tab" id="tab-cohort" aria-selected="false" aria-controls="cohort" data-hal="cohort" tabindex="-1">3. Cohort retention</button>
     </div>
-    <div class="filters" role="group" aria-label="Filter">
+    <div class="filters" id="filter-grup" role="group" aria-label="Filter">
       <label>Wilayah
         <select id="f-wilayah" autocomplete="off"><option value="semua">Semua</option><option value="uk">Inggris</option><option value="luar">Luar Inggris</option></select>
       </label>
@@ -118,8 +131,38 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
 
   <p class="note" id="catatan-cohort" hidden>Filter wilayah dan status tidak berlaku di halaman ini. Angka cohort sudah dirata-rata per bulan pembelian pertama, jadi tidak bisa dipecah per pelanggan. Status churn juga tidak cocok dipakai di sini: churn ditentukan dari belanja terakhir, sehingga memecah cohort menurut status itu melingkar.</p>
 
+  <!-- Halaman pembuka: apa itu RFM dan cohort -->
+  <main class="page p0 on" id="pengantar" role="tabpanel" aria-labelledby="tab-pengantar">
+    <section class="card">
+      <h2>RFM: siapa pelanggan yang paling bernilai?</h2>
+      <p class="cap">Setiap pelanggan dinilai dari tiga hal, masing-masing diberi skor 1 sampai 5 (5 terbaik). Kombinasi skornya menentukan satu dari 10 segmen, dari Champions sampai New Customers.</p>
+      <div class="rfm">
+        <div><div class="huruf">R</div><b>Recency</b><span>berapa hari sejak belanja terakhir</span></div>
+        <div><div class="huruf">F</div><b>Frequency</b><span>berapa kali belanja (jumlah invoice)</span></div>
+        <div><div class="huruf">M</div><b>Monetary</b><span>berapa total uang yang dibelanjakan</span></div>
+      </div>
+      <div id="rfm-contoh"></div>
+      <p class="note">Rata-rata seluruh pelanggan di tiap segmen. Pelanggan terbaik baru saja belanja dan sering; yang paling jauh sudah lebih dari setahun tidak kembali.</p>
+    </section>
+    <section class="card">
+      <h2>Cohort: berapa yang kembali setelah pembelian pertama?</h2>
+      <p class="cap">Pelanggan dikelompokkan menurut bulan pembelian pertamanya (satu baris = satu cohort), lalu dilihat berapa persen yang masih belanja 1, 2, 3 bulan sesudahnya.</p>
+      <div id="coh-mini"></div>
+      <p class="note">Contoh enam cohort pertama (Des 2009 sampai Mei 2010) dan enam bulan pertama. Bulan 0 selalu 100% karena itu bulan pembelian pertama. Gambar lengkap 25 cohort ada di halaman 3.</p>
+    </section>
+    <section class="card guide">
+      <h2>Mulai dari mana?</h2>
+      <p class="cap">Tiap halaman punya satu fokus. Pilih sesuai yang ingin kamu ketahui.</p>
+      <div class="langkah">
+        <button type="button" data-ke="ringkasan"><b>1. Ringkasan</b><span>Siapa yang menyumbang omzet terbesar, dan seberapa banyak pelanggan yang berhenti?</span></button>
+        <button type="button" data-ke="segmen"><b>2. Segmen dan wilayah</b><span>Seperti apa tiap segmen RFM, dan apakah pembeli Inggris berbeda dari luar Inggris?</span></button>
+        <button type="button" data-ke="cohort"><b>3. Cohort retention</b><span>Berapa persen pelanggan yang kembali, dan di bulan ke berapa mereka paling banyak hilang?</span></button>
+      </div>
+    </section>
+  </main>
+
   <!-- Halaman 1: gambaran besar -->
-  <main class="page p1 on" id="ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
+  <main class="page p1" id="ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
     <div class="card hero">
       <div class="big" id="hero-angka">-</div>
       <p id="hero-teks"></p>
@@ -186,7 +229,7 @@ const S = { wilayah: "semua", status: "semua" };
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
 const IDX = { seg: 0, churn: 1, uk: 2, rev: 3, aov: 4, rec: 5, frq: 6 };
-const HALAMAN = ["ringkasan", "segmen", "cohort"];
+const HALAMAN = ["pengantar", "ringkasan", "segmen", "cohort"];
 
 function el(tag, attrs, parent) {
   const e = document.createElementNS(NS, tag);
@@ -408,22 +451,62 @@ function gambarHeat() {
 }
 
 /* ---- render hanya halaman yang sedang tampil (ukuran grafik butuh panel yang terlihat) ---- */
-let halaman = "ringkasan";
+let halaman = "pengantar";
+/* ---- halaman pembuka: contoh RFM dan mini cohort dari data asli ---- */
+function gambarPengantar() {
+  const wadah = $("rfm-contoh"); wadah.replaceChildren();
+  const terbaik = D.segmen.indexOf("Champions"), terjauh = D.segmen.indexOf("Hibernating");
+  const rata2 = (i) => { const g = D.pelanggan.filter((c) => c[IDX.seg] === i);
+    return { n: g.length, rec: rata(g, IDX.rec), frq: rata(g, IDX.frq), mon: rata(g, IDX.rev) }; };
+  const a = rata2(terbaik), b = rata2(terjauh);
+  const des1 = (v) => v.toLocaleString("id-ID", { maximumFractionDigits: 1 });
+  const t = document.createElement("table"), kepala = t.createTHead().insertRow();
+  ["Rata-rata per pelanggan", "Champions", "Hibernating"].forEach((h) => { const th = document.createElement("th"); th.textContent = h; kepala.appendChild(th); });
+  const bd = t.createTBody();
+  [["Pelanggan", fInt(a.n), fInt(b.n)],
+   ["R: hari sejak belanja terakhir", fInt(a.rec) + " hari", fInt(b.rec) + " hari"],
+   ["F: jumlah invoice", des1(a.frq), des1(b.frq)],
+   ["M: total belanja", "£" + fInt(a.mon), "£" + fInt(b.mon)]].forEach((baris) => {
+    const r = bd.insertRow(); baris.forEach((v) => { r.insertCell().textContent = v; }); });
+  wadah.appendChild(t);
+
+  // mini cohort: 6 cohort pertama x bulan 0 sampai 5, nilai tertulis di tiap sel
+  const w2 = $("coh-mini"); w2.replaceChildren();
+  const W = Math.max(w2.clientWidth, 300), kiri = 78, atas = 36, sel = Math.min(52, (W - kiri) / 6), tinggi = 30;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${atas + 6 * tinggi + 4}`, role: "img",
+    "aria-label": "Contoh enam cohort pertama dan enam bulan pertama retention" }, w2);
+  teks("text", { x: kiri, y: 12, class: "t-ink2" }, "bulan sesudah pembelian pertama", svg);
+  for (let k = 0; k < 6; k++) teks("text", { x: kiri + k * sel + sel / 2, y: 28, "text-anchor": "middle", class: "t-muted" }, String(k), svg);
+  const NAMA = { "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr", "05": "Mei", "12": "Des" };
+  for (let r = 0; r < 6; r++) {
+    const [th, bl] = D.cohort_bulan[r].split("-");
+    teks("text", { x: kiri - 8, y: atas + r * tinggi + tinggi / 2 + 4, "text-anchor": "end", class: "t-ink2" }, (NAMA[bl] || bl) + " " + th, svg);
+    for (let k = 0; k < 6; k++) {
+      const v = D.cohort_matriks[r][k];
+      el("rect", { x: kiri + k * sel + 1, y: atas + r * tinggi + 1, width: sel - 2, height: tinggi - 2, rx: 3, fill: warnaSel(v) }, svg);
+      teks("text", { x: kiri + k * sel + sel / 2, y: atas + r * tinggi + tinggi / 2 + 4, "text-anchor": "middle",
+        fill: v >= (gelap() ? 20 : 30) ? "#fff" : "#0b0b0b" }, Math.round(v) + "%", svg);
+    }
+  }
+}
+
 function semua() {
   const r = ringkas(); // kartu angka selalu dihitung ulang
   const per = ringkasanSegmen(r), sorot = pilihSorotan(per);
   isiHero(per, sorot);
+  if (halaman === "pengantar") gambarPengantar();
   if (halaman === "ringkasan") { gambarSegmenBar(per, sorot); gambarAov(); }
   if (halaman === "segmen") { tabelSegmen(per); gambarWilayah(); }
   if (halaman === "cohort") { gambarRetention(); gambarHeat(); }
 }
 function bukaHalaman(nama, fokus) {
-  if (!HALAMAN.includes(nama)) nama = "ringkasan";
+  if (!HALAMAN.includes(nama)) nama = "pengantar";
   halaman = nama;
   HALAMAN.forEach((h) => {
     $(h).classList.toggle("on", h === nama);
     const tab = $("tab-" + h); tab.setAttribute("aria-selected", String(h === nama)); tab.tabIndex = h === nama ? 0 : -1;
   });
+  $("filter-grup").style.visibility = nama === "pengantar" ? "hidden" : "visible";
   const tanpaFilter = nama === "cohort";
   ["f-wilayah", "f-status"].forEach((id) => { $(id).disabled = tanpaFilter; $(id).parentElement.classList.toggle("mati", tanpaFilter); });
   $("catatan-cohort").hidden = !tanpaFilter;
@@ -437,10 +520,11 @@ function bacaFilter() { S.wilayah = $("f-wilayah").value; S.status = $("f-status
 $("f-wilayah").addEventListener("change", () => { bacaFilter(); semua(); });
 $("f-status").addEventListener("change", () => { bacaFilter(); semua(); });
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => bukaHalaman(b.dataset.hal, false)));
-$("tab-ringkasan").parentElement.addEventListener("keydown", (e) => {
+$("tab-pengantar").parentElement.addEventListener("keydown", (e) => {
   const i = HALAMAN.indexOf(halaman);
-  if (e.key === "ArrowRight") { e.preventDefault(); bukaHalaman(HALAMAN[(i + 1) % 3], true); }
-  if (e.key === "ArrowLeft") { e.preventDefault(); bukaHalaman(HALAMAN[(i + 2) % 3], true); }
+  const n = HALAMAN.length;
+  if (e.key === "ArrowRight") { e.preventDefault(); bukaHalaman(HALAMAN[(i + 1) % n], true); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); bukaHalaman(HALAMAN[(i + n - 1) % n], true); }
 });
 document.querySelectorAll(".seg").forEach((grup) => grup.addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
@@ -450,12 +534,13 @@ document.querySelectorAll(".seg").forEach((grup) => grup.addEventListener("click
 $("tema").addEventListener("click", () => { document.documentElement.dataset.theme = gelap() ? "light" : "dark"; semua(); });
 let tunda; addEventListener("resize", () => { clearTimeout(tunda); tunda = setTimeout(semua, 120); });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", semua);
+document.querySelectorAll("[data-ke]").forEach((b) => b.addEventListener("click", () => bukaHalaman(b.dataset.ke, false)));
 addEventListener("hashchange", () => bukaHalaman(location.hash.slice(1), false));
 
 // Browser bisa memulihkan pilihan dropdown saat halaman dimuat ulang tanpa memicu event
 // "change"; baca nilai awalnya supaya angka selalu sama dengan filter yang terlihat.
 bacaFilter();
-bukaHalaman(location.hash.slice(1) || "ringkasan", false);
+bukaHalaman(location.hash.slice(1) || "pengantar", false);
 </script>
 </body>
 </html>

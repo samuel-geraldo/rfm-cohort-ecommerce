@@ -160,7 +160,7 @@ Paket ini dibangun otomatis oleh `src/07_powerbi_data.py` dari file di `output/`
 Isinya data siap impor, measure DAX, dan tema warna. Visualnya disusun di Power BI
 Desktop (sekitar 20 sampai 30 menit), lalu disimpan sebagai
 `dashboard/customer_analytics.pbix`. Tampilan acuannya ada di
-[`preview-1-ringkasan.png`](../preview-1-ringkasan.png), [`preview-2-segmen.png`](../preview-2-segmen.png), dan [`preview-3-cohort.png`](../preview-3-cohort.png) di `dashboard/`.
+[`preview-0-pengantar.png`](../preview-0-pengantar.png), [`preview-1-ringkasan.png`](../preview-1-ringkasan.png), [`preview-2-segmen.png`](../preview-2-segmen.png), dan [`preview-3-cohort.png`](../preview-3-cohort.png) di `dashboard/`.
 
 > Measure DAX di sini belum diuji di Power BI Desktop. Gunakan angka acuan di
 > bagian bawah untuk memeriksanya setelah dibuat.
@@ -186,13 +186,27 @@ Di Data view, pilih kolom `segments[Segment]`, lalu **Sort by column** > `SortOr
 - **View > Themes > Browse for themes** > pilih `theme.json`.
 - Tempel measure dari [`measures.dax`](measures.dax) satu per satu lewat **New measure**.
 
-## 3. Susun tiga halaman
+## 3. Susun empat halaman
 
 Tata letaknya sama dengan dashboard HTML (`dashboard/customer_analytics.html`): landscape,
-tiap halaman satu fokus. Buat tiga halaman dan beri nama **Ringkasan**,
-**Segmen dan wilayah**, **Cohort retention**. Letakkan slicer `customers[Region]` dan
+tiap halaman satu fokus. Buat empat halaman dan beri nama **Mulai di sini**,
+**Ringkasan**, **Segmen dan wilayah**, **Cohort retention**. Letakkan slicer `customers[Region]` dan
 `customers[ChurnStatus]` di halaman pertama, lalu salin ke halaman 2 lewat
 **View > Sync slicers**.
+
+### Halaman 0: Mulai di sini
+
+Halaman pembuka tanpa slicer, supaya siapa pun langsung tahu ini dashboard RFM dan cohort.
+Isinya kotak teks dan satu tabel; tidak butuh measure baru.
+
+| Visual | Isi | Catatan |
+|---|---|---|
+| Text box (judul) | "E-commerce Customer Analytics: RFM Segmentation dan Cohort Retention" | di bagian atas |
+| Tiga text box | R Recency: berapa hari sejak belanja terakhir. F Frequency: berapa kali belanja. M Monetary: berapa total uang yang dibelanjakan | satu kotak per huruf; jelaskan skor 1 sampai 5 (5 terbaik) |
+| Table | `segments[Segment]`, `[Customers]`, `[Avg Recency]`, `[Avg Frequency]`, `[Avg Monetary]` | contoh nyata per segmen; filter visual untuk Champions dan Hibernating saja |
+| Matrix kecil | baris: `cohort_retention[cohort_month]`, kolom: `month_index`, nilai: `[Avg Retention %]` | filter visual: enam cohort pertama dan `month_index` 0 sampai 5, tampilkan nilainya |
+| Text box | "Bulan 0 selalu 100%. Gambar lengkap ada di halaman Cohort retention." | |
+| Page navigation | tombol ke tiga halaman lain (Insert > Buttons > Navigator > Page navigator) | |
 
 ### Halaman 1: Ringkasan
 

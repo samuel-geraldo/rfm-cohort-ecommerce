@@ -303,6 +303,10 @@ untuk grouping bulan.
 
 ## Dashboard
 
+**Mulai di sini: apa itu RFM dan cohort**
+
+![Dashboard halaman pembuka](dashboard/preview-0-pengantar.png)
+
 **Halaman 1: Ringkasan**
 
 ![Dashboard halaman ringkasan](dashboard/preview-1-ringkasan.png)
@@ -318,7 +322,8 @@ untuk grouping bulan.
 Dua keluaran, keduanya dibangun dari file di `output/` tanpa data mentah:
 
 - [`dashboard/customer_analytics.html`](dashboard/customer_analytics.html): dashboard
-  interaktif satu file (buka langsung di browser), landscape dan terbagi tiga halaman:
+  interaktif satu file (buka langsung di browser), landscape. Halaman pembuka menjelaskan
+  RFM dan cohort dengan data asli proyek ini, lalu tiga halaman analisis:
   ringkasan (kartu angka, kontribusi omzet per segmen, order value aktif dibanding
   churn), segmen dan wilayah (tabel rincian segmen, Inggris dibanding luar Inggris),
   dan cohort retention (retention per bulan dan heatmap). Filter wilayah dan status
@@ -354,7 +359,8 @@ rfm-cohort-ecommerce/
 │   └── queries.sql               # NTILE, LAG, CTE bertingkat, self-join
 ├── dashboard/
 │   ├── customer_analytics.html
-│   ├── preview-1-ringkasan.png   # tangkapan layar tiga halaman
+│   ├── preview-0-pengantar.png   # tangkapan layar tiap halaman
+│   ├── preview-1-ringkasan.png
 │   ├── preview-2-segmen.png
 │   ├── preview-3-cohort.png
 │   └── powerbi/                  # CSV, measures.dax, theme.json, panduan
