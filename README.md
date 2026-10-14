@@ -301,6 +301,25 @@ untuk grouping bulan.
 
 ---
 
+## Dashboard
+
+![Dashboard customer analytics](dashboard/preview.png)
+
+Dua keluaran, keduanya dibangun dari file di `output/` tanpa data mentah:
+
+- [`dashboard/customer_analytics.html`](dashboard/customer_analytics.html): dashboard
+  interaktif satu file (buka langsung di browser). Ada filter wilayah dan status,
+  kartu angka, kontribusi omzet per segmen, order value aktif dibanding churn,
+  retention per bulan, dan heatmap cohort. Dibangun oleh `src/06_dashboard.py`, yang
+  berhenti kalau angkanya tidak cocok dengan hasil di atas (2.387 churn, 5.335
+  pelanggan Inggris, retention bulan ke-1 20,99%).
+- [`dashboard/powerbi/`](dashboard/powerbi/): paket impor Power BI (tiga tabel CSV,
+  measure DAX, tema warna, dan panduan dengan angka acuan untuk memeriksa hasil).
+  Dibangun oleh `src/07_powerbi_data.py`. File `.pbix` menyusul setelah visualnya
+  disusun di Power BI Desktop.
+
+---
+
 ## Struktur Repo
 
 ```
@@ -314,10 +333,17 @@ rfm-cohort-ecommerce/
 │   ├── 02_rfm.py                 # skor & segment RFM
 │   ├── 03_cohort.py              # cohort retention matrix
 │   ├── 04_churn_geo.py           # validasi churn, geografis, uji-t
-│   └── 05_export_figures.py      # export chart ke PNG
+│   ├── 05_export_figures.py      # export chart ke PNG
+│   ├── 06_dashboard.py           # dashboard interaktif (HTML)
+│   ├── 07_powerbi_data.py        # paket impor Power BI
+│   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
 │   ├── buat_database.py          # muat parquet ke SQLite
 │   └── queries.sql               # NTILE, LAG, CTE bertingkat, self-join
+├── dashboard/
+│   ├── customer_analytics.html
+│   ├── preview.png
+│   └── powerbi/                  # CSV, measures.dax, theme.json, panduan
 ├── output/
 │   ├── rfm_table.csv
 │   ├── cohort_matrix.csv
@@ -370,7 +396,14 @@ python sql/buat_database.py
 sqlite3 sql/retail.db < sql/queries.sql
 ```
 
-**5. Buka notebook**
+**5. Bangun dashboard** (tidak butuh data mentah, hanya file di `output/`)
+
+```bash
+python src/06_dashboard.py       # dashboard/customer_analytics.html
+python src/07_powerbi_data.py    # dashboard/powerbi/
+```
+
+**6. Buka notebook**
 
 ```bash
 jupyter notebook notebooks/analisis_lanjutan.ipynb

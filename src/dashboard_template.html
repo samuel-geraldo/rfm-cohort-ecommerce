@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Analytics Online Retail II</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10);
+  --accent: #2a78d6; --soft: #c3c2b7; --wash: rgba(11,11,11,.045);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+    --accent: #3987e5; --soft: #4a4a46; --wash: rgba(255,255,255,.05);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+  --accent: #3987e5; --soft: #4a4a46; --wash: rgba(255,255,255,.05);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+h1 { font-size: 20px; margin: 0 0 4px; font-weight: 600; }
+.sub { color: var(--ink2); margin: 0; max-width: 62ch; }
+button, select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+button:hover, select:hover { background: var(--wash); }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.filters { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0 16px; align-items: center; }
+.filters label { color: var(--ink2); display: flex; gap: 8px; align-items: center; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.hero { margin-bottom: 16px; }
+.hero .big { font-size: 56px; line-height: 1.05; font-weight: 600; color: var(--accent); }
+.hero p { margin: 6px 0 0; color: var(--ink2); max-width: 60ch; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.tile .lab { color: var(--ink2); font-size: 12px; }
+.tile .val { font-size: 24px; font-weight: 600; margin-top: 2px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.wide { grid-column: 1 / -1; }
+.card h2 { font-size: 15px; margin: 0; font-weight: 600; }
+.card .cap { color: var(--ink2); font-size: 12px; margin: 2px 0 12px; }
+.head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex: none; }
+.seg button { border: 0; border-radius: 0; padding: 4px 10px; font-size: 12px; background: transparent; }
+.seg button[aria-pressed="true"] { background: var(--wash); font-weight: 600; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; }
+.t-ink { fill: var(--ink); } .t-ink2 { fill: var(--ink2); } .t-muted { fill: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--grid); }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--ink2); font-weight: 600; }
+.tablewrap { max-height: 360px; overflow: auto; }
+[hidden] { display: none !important; }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; box-shadow: 0 4px 16px rgba(0,0,0,.12); font-size: 12px; opacity: 0; transition: opacity .08s; max-width: 240px; }
+#tip b { display: block; font-size: 14px; }
+#tip .k { color: var(--ink2); }
+.note { color: var(--ink2); font-size: 12px; margin-top: 8px; }
+footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
+@media (max-width: 820px) { .tiles { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: 1fr; } .hero .big { font-size: 48px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Customer Analytics: RFM dan Cohort Retention</h1>
+      <p class="sub">Online Retail II (peritel online Inggris, Des 2009 sampai Des 2011). Segmentasi RFM, retention per cohort, dan perbedaan order value pelanggan aktif dan churn.</p>
+    </div>
+    <button id="tema" type="button">Ganti tema</button>
+  </header>
+
+  <div class="filters" role="group" aria-label="Filter">
+    <label>Wilayah
+      <select id="f-wilayah"><option value="semua">Semua</option><option value="uk">Inggris</option><option value="luar">Luar Inggris</option></select>
+    </label>
+    <label>Status
+      <select id="f-status"><option value="semua">Semua</option><option value="aktif">Aktif</option><option value="churn">Churn (180 hari)</option></select>
+    </label>
+    <span class="note" style="margin:0">Filter berlaku untuk angka ringkasan, segmen, dan order value. Data cohort tidak tersedia per pelanggan, jadi tidak ikut tersaring.</span>
+  </div>
+
+  <div class="card hero">
+    <div class="big" id="hero-angka">-</div>
+    <p id="hero-teks"></p>
+  </div>
+
+  <div class="tiles">
+    <div class="card tile"><div class="lab">Pelanggan</div><div class="val" id="k-pel">-</div></div>
+    <div class="card tile"><div class="lab">Total omzet</div><div class="val" id="k-omzet">-</div></div>
+    <div class="card tile"><div class="lab">Rata-rata order value</div><div class="val" id="k-aov">-</div></div>
+    <div class="card tile"><div class="lab">Pelanggan churn</div><div class="val" id="k-churn">-</div></div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <div class="head"><div><h2>Kontribusi omzet per segmen</h2><p class="cap">Persen dari total omzet pada filter yang dipilih</p></div>
+        <div class="seg" data-target="seg"><button type="button" aria-pressed="true" data-mode="grafik">Grafik</button><button type="button" aria-pressed="false" data-mode="tabel">Tabel</button></div></div>
+      <div id="seg-grafik"></div>
+      <div id="seg-tabel" class="tablewrap" hidden></div>
+    </section>
+
+    <section class="card">
+      <div class="head"><div><h2>Rata-rata order value</h2><p class="cap">Pelanggan aktif dibanding churn, pada filter wilayah</p></div></div>
+      <div id="aov-grafik"></div>
+      <p class="note">Seluruh pelanggan: uji-t Welch t = -2,36, p = 0,018. Ini korelasi, bukan sebab-akibat.</p>
+    </section>
+
+    <section class="card wide">
+      <div class="head"><div><h2>Retention rata-rata per bulan sejak pembelian pertama</h2><p class="cap">Rata-rata seluruh cohort; area berarsir: makin sedikit cohort yang ikut dirata-rata (survivorship)</p></div>
+        <div class="seg" data-target="ret"><button type="button" aria-pressed="true" data-mode="grafik">Grafik</button><button type="button" aria-pressed="false" data-mode="tabel">Tabel</button></div></div>
+      <div id="ret-grafik"></div>
+      <div id="ret-tabel" class="tablewrap" hidden></div>
+    </section>
+
+    <section class="card wide">
+      <h2>Cohort retention heatmap</h2>
+      <p class="cap">Baris: bulan pembelian pertama. Kolom: bulan ke-n sesudahnya. Sel kosong berarti belum ada data (bukan 0%). Skala warna 0 sampai 50%.</p>
+      <div id="heat-grafik"></div>
+      <p class="note">Nilai tiap sel ada di output/cohort_matrix.csv.</p>
+    </section>
+  </div>
+  <footer>Sumber: UCI Online Retail II. Nilai dalam pound sterling. Dibangun oleh src/06_dashboard.py dari file di output/.</footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const D = /*__DATA__*/null;
+const S = { wilayah: "semua", status: "semua" };
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+const IDX = { seg: 0, churn: 1, uk: 2, rev: 3, aov: 4 };
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function teks(tag, attrs, isi, parent) { const e = el(tag, attrs, parent); e.textContent = isi; return e; }
+const fInt = (n) => Math.round(n).toLocaleString("id-ID");
+const fPct = (n) => n.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+const fDes = (n) => n.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fOmzet = (n) => n >= 1e6 ? "£" + (n / 1e6).toLocaleString("id-ID", { maximumFractionDigits: 2 }) + " jt" : "£" + fInt(n);
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const gelap = () => matchMedia("(prefers-color-scheme: dark)").matches
+  ? document.documentElement.dataset.theme !== "light" : document.documentElement.dataset.theme === "dark";
+
+function subset() {
+  return D.pelanggan.filter((c) =>
+    (S.wilayah === "semua" || (S.wilayah === "uk") === (c[IDX.uk] === 1)) &&
+    (S.status === "semua" || (S.status === "churn") === (c[IDX.churn] === 1)));
+}
+
+/* ---- tooltip: satu elemen, isi lewat textContent ---- */
+const tip = $("tip");
+function tampilTip(e, judul, baris) {
+  tip.replaceChildren();
+  const b = document.createElement("b"); b.textContent = judul; tip.appendChild(b);
+  for (const [k, v] of baris) {
+    const d = document.createElement("div");
+    const sp = document.createElement("span"); sp.className = "k"; sp.textContent = k + ": ";
+    d.appendChild(sp); d.appendChild(document.createTextNode(v)); tip.appendChild(d);
+  }
+  const x = e.clientX, y = e.clientY, w = tip.offsetWidth;
+  tip.style.left = Math.min(x + 14, innerWidth - w - 8) + "px";
+  tip.style.top = (y + 14) + "px";
+  tip.style.opacity = 1;
+}
+const sembunyiTip = () => { tip.style.opacity = 0; };
+function posisiFokus(node) { const r = node.getBoundingClientRect(); return { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }; }
+
+/* ---- bar horizontal: ujung kanan membulat 4px, pangkal kiri rata ---- */
+function jalurBar(x, y, w, h) {
+  if (w <= 4) return `M${x},${y}h${Math.max(w, 1)}v${h}h-${Math.max(w, 1)}z`;
+  return `M${x},${y}h${w - 4}a4,4 0 0 1 4,4v${h - 8}a4,4 0 0 1 -4,4h-${w - 4}z`;
+}
+
+function gambarBar(wadah, items, opsi) {
+  // items: [{nama, nilai, warna, label, tip:[[k,v]...]}]
+  wadah.replaceChildren();
+  const W = Math.max(wadah.clientWidth, 280), kiri = opsi.kiri, kanan = 64, baris = 34, tebal = 20;
+  const H = items.length * baris + 8;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": opsi.aria }, wadah);
+  const skala = (W - kiri - kanan) / opsi.maks;
+  el("line", { x1: kiri, x2: kiri, y1: 0, y2: H, stroke: css("--axis"), "stroke-width": 1 }, svg);
+  items.forEach((it, i) => {
+    const y = i * baris + 4, lebar = Math.max(it.nilai * skala, 0);
+    teks("text", { x: kiri - 10, y: y + tebal / 2 + 4, "text-anchor": "end", class: "t-ink2" }, it.nama, svg);
+    const bar = el("path", { d: jalurBar(kiri, y + (baris - 8 - tebal) / 2, lebar, tebal), fill: it.warna }, svg);
+    teks("text", { x: kiri + lebar + 8, y: y + tebal / 2 + 4, class: "t-ink" }, it.label, svg);
+    const hit = el("rect", { x: 0, y: y - 4, width: W, height: baris, fill: "transparent", tabindex: 0,
+      "aria-label": it.nama + ": " + it.label }, svg);
+    const aktif = (e) => { bar.setAttribute("opacity", ".78"); tampilTip(e, it.nama, it.tip); };
+    const lepas = () => { bar.removeAttribute("opacity"); sembunyiTip(); };
+    hit.addEventListener("pointermove", aktif); hit.addEventListener("pointerleave", lepas);
+    hit.addEventListener("focus", () => aktif(posisiFokus(hit))); hit.addEventListener("blur", lepas);
+  });
+}
+
+/* ---- ringkasan, hero, kartu angka ---- */
+function ringkas() {
+  const sub = subset(), n = sub.length;
+  const omzet = sub.reduce((a, c) => a + c[IDX.rev], 0);
+  const aov = sub.reduce((a, c) => a + c[IDX.aov], 0) / n;
+  const churn = sub.filter((c) => c[IDX.churn] === 1).length;
+  $("k-pel").textContent = fInt(n);
+  $("k-omzet").textContent = fOmzet(omzet);
+  $("k-aov").textContent = "£" + fDes(aov);
+  $("k-churn").textContent = fPct(churn / n * 100) + " (" + fInt(churn) + ")";
+  const champ = sub.filter((c) => c[IDX.seg] === 0);
+  const pRev = champ.reduce((a, c) => a + c[IDX.rev], 0) / omzet * 100;
+  $("hero-angka").textContent = fPct(pRev);
+  $("hero-teks").textContent = fPct(champ.length / n * 100) + " pelanggan (" + fInt(champ.length) + ", segmen Champions) menyumbang " +
+    fPct(pRev) + " omzet pada filter ini.";
+  return { sub, n, omzet };
+}
+
+/* ---- kontribusi omzet per segmen ---- */
+function gambarSegmen({ sub, n, omzet }) {
+  const per = D.segmen.map((nama, i) => {
+    const grup = sub.filter((c) => c[IDX.seg] === i), rev = grup.reduce((a, c) => a + c[IDX.rev], 0);
+    return { nama, i, n: grup.length, pRev: rev / omzet * 100, pPel: grup.length / n * 100 };
+  }).sort((a, b) => b.pRev - a.pRev);
+  const maks = Math.max(...per.map((p) => p.pRev), 1);
+  gambarBar($("seg-grafik"), per.map((p) => ({
+    nama: p.nama, nilai: p.pRev, warna: p.i === 0 ? css("--accent") : css("--soft"), label: fPct(p.pRev),
+    tip: [["Omzet", fPct(p.pRev)], ["Pelanggan", fInt(p.n) + " (" + fPct(p.pPel) + ")"]],
+  })), { kiri: 128, maks: maks * 1.0, aria: "Kontribusi omzet per segmen pelanggan" });
+  const tb = $("seg-tabel"); tb.replaceChildren();
+  const t = document.createElement("table"), kepala = t.createTHead().insertRow();
+  ["Segmen", "Pelanggan", "% pelanggan", "% omzet"].forEach((h) => { const th = document.createElement("th"); th.textContent = h; kepala.appendChild(th); });
+  const bd = t.createTBody();
+  per.forEach((p) => { const r = bd.insertRow();
+    [p.nama, fInt(p.n), fPct(p.pPel), fPct(p.pRev)].forEach((v) => { r.insertCell().textContent = v; }); });
+  tb.appendChild(t);
+}
+
+/* ---- order value aktif vs churn (mengikuti filter wilayah) ---- */
+function gambarAov() {
+  const dasar = D.pelanggan.filter((c) => S.wilayah === "semua" || (S.wilayah === "uk") === (c[IDX.uk] === 1));
+  const rata = (arr) => arr.reduce((a, c) => a + c[IDX.aov], 0) / arr.length;
+  const aktif = dasar.filter((c) => c[IDX.churn] === 0), churn = dasar.filter((c) => c[IDX.churn] === 1);
+  const items = [];
+  if (S.status !== "churn") items.push({ nama: "Aktif", nilai: rata(aktif), warna: css("--accent"), n: aktif.length });
+  if (S.status !== "aktif") items.push({ nama: "Churn", nilai: rata(churn), warna: css("--soft"), n: churn.length });
+  gambarBar($("aov-grafik"), items.map((it) => ({ ...it, label: "£" + fDes(it.nilai),
+    tip: [["Rata-rata order value", "£" + fDes(it.nilai)], ["Pelanggan", fInt(it.n)]] })),
+    { kiri: 64, maks: Math.max(...items.map((i) => i.nilai)) * 1.0, aria: "Rata-rata order value pelanggan aktif dan churn" });
+}
+
+/* ---- retention rata-rata per bulan (garis) ---- */
+function rataBulan() {
+  const out = [];
+  for (let k = 1; k <= 24; k++) {
+    const v = D.cohort_matriks.map((b) => b[k]).filter((x) => x !== null);
+    out.push({ k, rata: v.reduce((a, x) => a + x, 0) / v.length, cohort: v.length });
+  }
+  return out;
+}
+function gambarRetention() {
+  const data = rataBulan(), wadah = $("ret-grafik"); wadah.replaceChildren();
+  const W = Math.max(wadah.clientWidth, 320), H = 250, m = { k: 40, a: 12, r: 20, b: 32 };
+  const pw = W - m.k - m.r, ph = H - m.a - m.b, maksY = 30;
+  const X = (k) => m.k + (k - 1) / 23 * pw, Y = (v) => m.a + ph - v / maksY * ph;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Retention rata-rata per bulan sejak pembelian pertama" }, wadah);
+  el("rect", { x: X(6.5), y: m.a, width: X(24) - X(6.5), height: ph, fill: css("--wash") }, svg);
+  teks("text", { x: X(24), y: m.a + 14, "text-anchor": "end", class: "t-muted" }, "makin sedikit cohort", svg);
+  [0, 10, 20, 30].forEach((v) => {
+    el("line", { x1: m.k, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": 1 }, svg);
+    teks("text", { x: m.k - 8, y: Y(v) + 4, "text-anchor": "end", class: "t-muted" }, v + "%", svg);
+  });
+  [1, 6, 12, 18, 24].forEach((k) => teks("text", { x: X(k), y: H - 10, "text-anchor": "middle", class: "t-muted" }, "bln " + k, svg));
+  el("path", { d: data.map((p, i) => (i ? "L" : "M") + X(p.k) + "," + Y(p.rata)).join(""), fill: "none",
+    stroke: css("--accent"), "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+  const p1 = data[0];
+  teks("text", { x: X(1) + 10, y: Y(p1.rata) - 10, class: "t-ink" }, fPct(p1.rata), svg);
+  const garis = el("line", { y1: m.a, y2: m.a + ph, stroke: css("--axis"), "stroke-width": 1, opacity: 0 }, svg);
+  const titik = el("circle", { r: 4.5, fill: css("--accent"), stroke: css("--surface"), "stroke-width": 2, opacity: 0 }, svg);
+  const hit = el("rect", { x: m.k, y: m.a, width: pw, height: ph, fill: "transparent", tabindex: 0, "aria-label": "Retention per bulan, gunakan tabel untuk semua nilai" }, svg);
+  const tunjuk = (e, p) => { garis.setAttribute("x1", X(p.k)); garis.setAttribute("x2", X(p.k)); garis.setAttribute("opacity", 1);
+    titik.setAttribute("cx", X(p.k)); titik.setAttribute("cy", Y(p.rata)); titik.setAttribute("opacity", 1);
+    tampilTip(e, "Bulan ke-" + p.k, [["Retention rata-rata", fPct(p.rata)], ["Cohort dirata-rata", fInt(p.cohort)]]); };
+  const lepas = () => { garis.setAttribute("opacity", 0); titik.setAttribute("opacity", 0); sembunyiTip(); };
+  hit.addEventListener("pointermove", (e) => { const r = svg.getBoundingClientRect(), s = W / r.width,
+    k = Math.min(24, Math.max(1, Math.round(((e.clientX - r.left) * s - m.k) / pw * 23 + 1))); tunjuk(e, data[k - 1]); });
+  hit.addEventListener("pointerleave", lepas); hit.addEventListener("blur", lepas);
+  hit.addEventListener("focus", () => tunjuk(posisiFokus(hit), data[0]));
+  const tb = $("ret-tabel"); tb.replaceChildren();
+  const t = document.createElement("table"), kepala = t.createTHead().insertRow();
+  ["Bulan ke-", "Retention rata-rata", "Cohort dirata-rata"].forEach((h) => { const th = document.createElement("th"); th.textContent = h; kepala.appendChild(th); });
+  const bd = t.createTBody();
+  data.forEach((p) => { const r = bd.insertRow(); [String(p.k), fPct(p.rata), fInt(p.cohort)].forEach((v) => { r.insertCell().textContent = v; }); });
+  tb.appendChild(t);
+}
+
+/* ---- heatmap cohort: skala biru satu warna, gelap berarti retention tinggi ---- */
+const RAMP_TERANG = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"];
+function warnaSel(v) {
+  const t = Math.min(Math.max(v / 50, 0), 1), ramp = gelap() ? RAMP_TERANG.slice().reverse() : RAMP_TERANG;
+  const pos = t * (ramp.length - 1), i = Math.min(Math.floor(pos), ramp.length - 2), f = pos - i;
+  const h = (s) => [1, 3, 5].map((j) => parseInt(s.slice(j, j + 2), 16));
+  const a = h(ramp[i]), b = h(ramp[i + 1]);
+  return "rgb(" + a.map((x, j) => Math.round(x + (b[j] - x) * f)).join(",") + ")";
+}
+function gambarHeat() {
+  const wadah = $("heat-grafik"); wadah.replaceChildren();
+  const W = Math.max(wadah.clientWidth, 360), kiri = 64, atas = 22, w = (W - kiri) / 25, h = 16;
+  const H = atas + D.cohort_bulan.length * h + 4;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Heatmap cohort retention, nilai ada di output/cohort_matrix.csv" }, wadah);
+  [0, 6, 12, 18, 24].forEach((k) => teks("text", { x: kiri + k * w + w / 2, y: 12, "text-anchor": "middle", class: "t-muted" }, "bln " + k, svg));
+  D.cohort_bulan.forEach((bulan, r) => {
+    if (r % 3 === 0) teks("text", { x: kiri - 8, y: atas + r * h + h / 2 + 4, "text-anchor": "end", class: "t-muted" }, bulan, svg);
+    D.cohort_matriks[r].forEach((v, k) => {
+      if (v === null) return;
+      const sel = el("rect", { x: kiri + k * w + 1, y: atas + r * h + 1, width: w - 2, height: h - 2, rx: 2, fill: warnaSel(v) }, svg);
+      sel.addEventListener("pointermove", (e) => { sel.setAttribute("stroke", css("--ink")); sel.setAttribute("stroke-width", 1.5);
+        tampilTip(e, "Cohort " + bulan, [["Bulan ke-", String(k)], ["Retention", fPct(v)]]); });
+      sel.addEventListener("pointerleave", () => { sel.removeAttribute("stroke"); sembunyiTip(); });
+    });
+  });
+}
+
+function semua() { const r = ringkas(); gambarSegmen(r); gambarAov(); gambarRetention(); gambarHeat(); }
+
+$("f-wilayah").addEventListener("change", (e) => { S.wilayah = e.target.value; semua(); });
+$("f-status").addEventListener("change", (e) => { S.status = e.target.value; semua(); });
+document.querySelectorAll(".seg").forEach((grup) => grup.addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  grup.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  const t = grup.dataset.target; $(t + "-grafik").hidden = b.dataset.mode === "tabel"; $(t + "-tabel").hidden = b.dataset.mode !== "tabel";
+}));
+$("tema").addEventListener("click", () => { document.documentElement.dataset.theme = gelap() ? "light" : "dark"; semua(); });
+let tunda; addEventListener("resize", () => { clearTimeout(tunda); tunda = setTimeout(semua, 120); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", semua);
+semua();
+</script>
+</body>
+</html>
