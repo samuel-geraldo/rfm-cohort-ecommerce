@@ -112,10 +112,10 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
 
   <div class="bar">
     <div class="tabs" role="tablist" aria-label="Halaman dashboard">
-      <button type="button" role="tab" id="tab-pengantar" aria-selected="true" aria-controls="pengantar" data-hal="pengantar">Mulai di sini</button>
-      <button type="button" role="tab" id="tab-ringkasan" aria-selected="false" aria-controls="ringkasan" data-hal="ringkasan" tabindex="-1">1. Ringkasan</button>
-      <button type="button" role="tab" id="tab-segmen" aria-selected="false" aria-controls="segmen" data-hal="segmen" tabindex="-1">2. Segmen dan wilayah</button>
-      <button type="button" role="tab" id="tab-cohort" aria-selected="false" aria-controls="cohort" data-hal="cohort" tabindex="-1">3. Cohort retention</button>
+      <button type="button" role="tab" id="tab-pengantar" aria-selected="true" aria-controls="hal-pengantar" data-hal="pengantar">Mulai di sini</button>
+      <button type="button" role="tab" id="tab-ringkasan" aria-selected="false" aria-controls="hal-ringkasan" data-hal="ringkasan" tabindex="-1">1. Ringkasan</button>
+      <button type="button" role="tab" id="tab-segmen" aria-selected="false" aria-controls="hal-segmen" data-hal="segmen" tabindex="-1">2. Segmen dan wilayah</button>
+      <button type="button" role="tab" id="tab-cohort" aria-selected="false" aria-controls="hal-cohort" data-hal="cohort" tabindex="-1">3. Cohort retention</button>
     </div>
     <div class="filters" id="filter-grup" role="group" aria-label="Filter">
       <label>Wilayah
@@ -132,7 +132,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
   <p class="note" id="catatan-cohort" hidden>Filter wilayah dan status tidak berlaku di halaman ini. Angka cohort sudah dirata-rata per bulan pembelian pertama, jadi tidak bisa dipecah per pelanggan. Status churn juga tidak cocok dipakai di sini: churn ditentukan dari belanja terakhir, sehingga memecah cohort menurut status itu melingkar.</p>
 
   <!-- Halaman pembuka: apa itu RFM dan cohort -->
-  <main class="page p0 on" id="pengantar" role="tabpanel" aria-labelledby="tab-pengantar">
+  <main class="page p0 on" id="hal-pengantar" role="tabpanel" aria-labelledby="tab-pengantar">
     <section class="card">
       <h2>RFM: siapa pelanggan yang paling bernilai?</h2>
       <p class="cap">Setiap pelanggan dinilai dari tiga hal, masing-masing diberi skor 1 sampai 5 (5 terbaik). Kombinasi skornya menentukan satu dari 10 segmen, dari Champions sampai New Customers.</p>
@@ -162,7 +162,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
   </main>
 
   <!-- Halaman 1: gambaran besar -->
-  <main class="page p1" id="ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
+  <main class="page p1" id="hal-ringkasan" role="tabpanel" aria-labelledby="tab-ringkasan">
     <div class="card hero">
       <div class="big" id="hero-angka">-</div>
       <p id="hero-teks"></p>
@@ -187,7 +187,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
   </main>
 
   <!-- Halaman 2: segmen dan wilayah -->
-  <main class="page p2" id="segmen" role="tabpanel" aria-labelledby="tab-segmen">
+  <main class="page p2" id="hal-segmen" role="tabpanel" aria-labelledby="tab-segmen">
     <section class="card">
       <h2>Rincian segmen</h2>
       <p class="cap">Mengikuti filter wilayah dan status. Rata-rata dihitung per pelanggan.</p>
@@ -204,7 +204,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 12px; }
   </main>
 
   <!-- Halaman 3: cohort retention -->
-  <main class="page p3" id="cohort" role="tabpanel" aria-labelledby="tab-cohort">
+  <main class="page p3" id="hal-cohort" role="tabpanel" aria-labelledby="tab-cohort">
     <section class="card">
       <div class="head"><div><h2>Retention rata-rata per bulan</h2><p class="cap">Area berarsir: makin sedikit cohort yang dirata-rata (survivorship)</p></div>
         <div class="seg" data-target="ret"><button type="button" aria-pressed="true" data-mode="grafik">Grafik</button><button type="button" aria-pressed="false" data-mode="tabel">Tabel</button></div></div>
@@ -503,7 +503,7 @@ function bukaHalaman(nama, fokus) {
   if (!HALAMAN.includes(nama)) nama = "pengantar";
   halaman = nama;
   HALAMAN.forEach((h) => {
-    $(h).classList.toggle("on", h === nama);
+    $("hal-" + h).classList.toggle("on", h === nama);
     const tab = $("tab-" + h); tab.setAttribute("aria-selected", String(h === nama)); tab.tabIndex = h === nama ? 0 : -1;
   });
   $("filter-grup").style.visibility = nama === "pengantar" ? "hidden" : "visible";
