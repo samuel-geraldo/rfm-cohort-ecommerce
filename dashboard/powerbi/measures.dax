@@ -8,10 +8,25 @@ Total Revenue = SUM ( customers[Monetary] )
 
 Avg Order Value = AVERAGE ( customers[AvgOrderValue] )
 
+// Rata-rata per pelanggan, dipakai di tabel rincian segmen
+Avg Recency = AVERAGE ( customers[Recency] )
+
+Avg Frequency = AVERAGE ( customers[Frequency] )
+
+Avg Monetary = AVERAGE ( customers[Monetary] )
+
 Churn Rate =
 DIVIDE (
     CALCULATE ( [Customers], customers[ChurnStatus] = "Churned" ),
     [Customers]
+)
+
+// Persen churn terhadap semua pelanggan di wilayah yang dipilih, tanpa memedulikan slicer status.
+// Dipakai di kartu: kalau slicer status ikut berlaku, hasilnya selalu 100% (Churned) atau 0% (Active).
+Churn Rate (Region) =
+DIVIDE (
+    CALCULATE ( [Customers], customers[ChurnStatus] = "Churned", REMOVEFILTERS ( customers[ChurnStatus] ) ),
+    CALCULATE ( [Customers], REMOVEFILTERS ( customers[ChurnStatus] ) )
 )
 
 // Persen omzet satu segmen dari total omzet pada slicer yang aktif

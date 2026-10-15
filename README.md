@@ -303,14 +303,33 @@ untuk grouping bulan.
 
 ## Dashboard
 
-![Dashboard customer analytics](dashboard/preview.png)
+**[Buka dashboard interaktif](https://samuel-geraldo.github.io/rfm-cohort-ecommerce/dashboard/customer_analytics.html)** (satu halaman web, tidak perlu menginstal apa pun; filter wilayah dan status churn bisa dicoba langsung).
+
+**Mulai di sini: apa itu RFM dan cohort**
+
+![Dashboard halaman pembuka](dashboard/preview-0-pengantar.png)
+
+**Halaman 1: Ringkasan**
+
+![Dashboard halaman ringkasan](dashboard/preview-1-ringkasan.png)
+
+**Halaman 2: Segmen dan wilayah**
+
+![Dashboard halaman segmen dan wilayah](dashboard/preview-2-segmen.png)
+
+**Halaman 3: Cohort retention**
+
+![Dashboard halaman cohort retention](dashboard/preview-3-cohort.png)
 
 Dua keluaran, keduanya dibangun dari file di `output/` tanpa data mentah:
 
 - [`dashboard/customer_analytics.html`](dashboard/customer_analytics.html): dashboard
-  interaktif satu file (buka langsung di browser). Ada filter wilayah dan status,
-  kartu angka, kontribusi omzet per segmen, order value aktif dibanding churn,
-  retention per bulan, dan heatmap cohort. Dibangun oleh `src/06_dashboard.py`, yang
+  interaktif satu file (buka langsung di browser), landscape. Halaman pembuka menjelaskan
+  RFM dan cohort dengan data asli proyek ini, lalu tiga halaman analisis:
+  ringkasan (kartu angka, kontribusi omzet per segmen, order value aktif dibanding
+  churn), segmen dan wilayah (tabel rincian segmen, Inggris dibanding luar Inggris),
+  dan cohort retention (retention per bulan dan heatmap). Filter wilayah dan status
+  berlaku di halaman 1 dan 2. Dibangun oleh `src/06_dashboard.py`, yang
   berhenti kalau angkanya tidak cocok dengan hasil di atas (2.387 churn, 5.335
   pelanggan Inggris, retention bulan ke-1 20,99%).
 - [`dashboard/powerbi/`](dashboard/powerbi/): paket impor Power BI (tiga tabel CSV,
@@ -342,7 +361,10 @@ rfm-cohort-ecommerce/
 │   └── queries.sql               # NTILE, LAG, CTE bertingkat, self-join
 ├── dashboard/
 │   ├── customer_analytics.html
-│   ├── preview.png
+│   ├── preview-0-pengantar.png   # tangkapan layar tiap halaman
+│   ├── preview-1-ringkasan.png
+│   ├── preview-2-segmen.png
+│   ├── preview-3-cohort.png
 │   └── powerbi/                  # CSV, measures.dax, theme.json, panduan
 ├── output/
 │   ├── rfm_table.csv

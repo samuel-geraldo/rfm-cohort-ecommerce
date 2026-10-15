@@ -55,6 +55,12 @@ assert total_inggris == 5335, f"Inggris {total_inggris}, README menulis 5.335"
 for r in ringkas_segmen.itertuples():
     omzet = sum(b[3] for b in baris if b[0] == indeks_segmen[r.Segment])
     assert abs(omzet - r.Total_monetary) < 5, f"omzet {r.Segment} tidak cocok"
+# Halaman "Segmen dan wilayah": rata-rata per wilayah (README, temuan 4)
+inggris = [b for b in baris if b[2] == 1]
+luar = [b for b in baris if b[2] == 0]
+rata_kolom = lambda grup, i: sum(b[i] for b in grup) / len(grup)
+assert (round(rata_kolom(inggris, 4), 2), round(rata_kolom(luar, 4), 2)) == (356.13, 627.92), "order value wilayah"
+assert (round(rata_kolom(inggris, 6), 2), round(rata_kolom(luar, 6), 2)) == (6.26, 6.19), "frequency wilayah"
 rata_bulan_1 = cohort["1"].mean()
 assert round(rata_bulan_1, 2) == 20.99, f"retention bulan ke-1 {rata_bulan_1:.2f}, README 20,99"
 
