@@ -436,6 +436,12 @@ function warnaSel(v) {
   const a = h(ramp[i]), b = h(ramp[i + 1]);
   return "rgb(" + a.map((x, j) => Math.round(x + (b[j] - x) * f)).join(",") + ")";
 }
+// warna teks sel dipilih dari terang-gelapnya warna sel (kontras tertinggi): hitam di biru terang, putih di biru gelap
+function warnaTeksSel(rgb) {
+  const lin = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+  const [r, g, b] = rgb.match(/\d+/g).map(Number);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b) > 0.18 ? "#0b0b0b" : "#fff";
+}
 function gambarHeat() {
   const wadah = $("heat-grafik"); wadah.replaceChildren();
   const W = Math.max(wadah.clientWidth, 340), kiri = 60, atas = 20, w = (W - kiri) / 25, h = 14;
@@ -487,9 +493,10 @@ function gambarPengantar() {
     teks("text", { x: kiri - 8, y: atas + r * tinggi + tinggi / 2 + 4, "text-anchor": "end", class: "t-ink2" }, (NAMA[bl] || bl) + " " + th, svg);
     for (let k = 0; k < 6; k++) {
       const v = D.cohort_matriks[r][k];
-      el("rect", { x: kiri + k * sel + 1, y: atas + r * tinggi + 1, width: sel - 2, height: tinggi - 2, rx: 3, fill: warnaSel(v) }, svg);
+      const warna = warnaSel(v);
+      el("rect", { x: kiri + k * sel + 1, y: atas + r * tinggi + 1, width: sel - 2, height: tinggi - 2, rx: 3, fill: warna }, svg);
       teks("text", { x: kiri + k * sel + sel / 2, y: atas + r * tinggi + tinggi / 2 + 4, "text-anchor": "middle",
-        fill: v >= (gelap() ? 20 : 30) ? "#fff" : "#0b0b0b" }, Math.round(v) + "%", svg);
+        fill: warnaTeksSel(warna) }, Math.round(v) + "%", svg);
     }
   }
 }
