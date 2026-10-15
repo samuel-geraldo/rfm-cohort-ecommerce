@@ -1,12 +1,12 @@
 """
 04_churn_geo.py
 
-Validasi ambang churn 180 hari (dari CLAUDE.md) lewat distribusi interval
+Validasi ambang churn 180 hari (dari definisi awal proyek) lewat distribusi interval
 antar-order repeat customer, tandai status Churned/Active di
 output/rfm_table.csv, bandingkan UK vs non-UK, dan uji-t rata-rata order
 value antara customer Churned vs Active.
 
-Geografis: UK vs non-UK saja (sesuai definisi yang dikunci di CLAUDE.md) —
+Geografis: UK vs non-UK saja (sesuai definisi yang dikunci di awal proyek) —
 tidak dipecah jadi banyak negara karena sampelnya timpang (UK dominan).
 """
 
@@ -20,7 +20,7 @@ PATH_RFM = Path("output/rfm_table.csv")
 PATH_OUTPUT = Path("output/churn_summary.csv")
 
 SNAPSHOT_DATE = pd.Timestamp("2011-12-10")
-AMBANG_CHURN_AWAL = 180  # hari, dari CLAUDE.md — divalidasi di bawah
+AMBANG_CHURN_AWAL = 180  # hari, dari definisi awal proyek — divalidasi di bawah
 
 
 def main() -> None:

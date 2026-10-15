@@ -4,7 +4,7 @@
 Bangun cohort matrix (retention rate customer per bulan sejak bulan
 pembelian pertamanya) dari data bersih hasil 01_load_clean.py.
 
-Retained (definisi yang dikunci di CLAUDE.md): customer yang belanja lagi
+Retained (definisi yang dikunci di awal proyek): customer yang belanja lagi
 di bulan ke-n setelah bulan pertama.
 """
 
@@ -43,7 +43,7 @@ def main() -> None:
     # dibiarkan bertipe Period dan pivot dipanggil tanpa `values` eksplisit
     # (mis. lewat pivot_table setelah groupby.agg({...})), hasilnya
     # MultiIndex kolom (level pertama nama kolom value, level kedua
-    # cohort_index) — sesuai bug watchlist di CLAUDE.md, sudah dicoba dan
+    # cohort_index) — sesuai daftar bug yang diantisipasi di awal proyek, sudah dicoba dan
     # kejadian nyata saat development. Pakai .pivot() dengan `values`
     # eksplisit menghindari itu, hasilnya tetap kolom flat.
     cohort_data["cohort_month"] = cohort_data["cohort_month"].astype(str)
