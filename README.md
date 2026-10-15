@@ -303,6 +303,8 @@ untuk grouping bulan.
 
 ## Dashboard
 
+**[Buka dashboard interaktif](https://samuel-geraldo.github.io/rfm-cohort-ecommerce/dashboard/customer_analytics.html)** (satu halaman web, tidak perlu menginstal apa pun; filter wilayah dan status churn bisa dicoba langsung).
+
 **Mulai di sini: apa itu RFM dan cohort**
 
 ![Dashboard halaman pembuka](dashboard/preview-0-pengantar.png)
