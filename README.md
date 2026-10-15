@@ -336,8 +336,8 @@ Dua keluaran, keduanya dibangun dari file di `output/` tanpa data mentah:
   pelanggan Inggris, retention bulan ke-1 20,99%).
 - [`dashboard/powerbi/`](dashboard/powerbi/): paket impor Power BI (tiga tabel CSV,
   measure DAX, tema warna, dan panduan dengan angka acuan untuk memeriksa hasil).
-  Dibangun oleh `src/07_powerbi_data.py`. File `.pbix` menyusul setelah visualnya
-  disusun di Power BI Desktop.
+  Dibangun oleh `src/07_powerbi_data.py`. Berkas `.pbix` belum dibuat; paket ini
+  berisi bahan untuk menyusunnya sendiri di Power BI Desktop.
 
 ---
 
