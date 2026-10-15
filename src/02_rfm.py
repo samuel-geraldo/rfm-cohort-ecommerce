@@ -14,7 +14,7 @@ import pandas as pd
 PATH_BERSIH = Path("data/processed/retail_bersih.parquet")
 PATH_OUTPUT = Path("output/rfm_table.csv")
 
-# Snapshot date untuk Recency, sudah dikunci di CLAUDE.md.
+# Snapshot date untuk Recency, sudah dikunci di awal proyek.
 SNAPSHOT_DATE = pd.Timestamp("2011-12-10")
 
 # Mapping Segment dari kombinasi (R_score, F_score). Ditulis lewat loop per
@@ -68,7 +68,7 @@ def main() -> None:
     # Skor 1-5 pakai quintile (qcut). rank(method='first') dipakai dulu
     # sebelum qcut supaya nilai yang menumpuk (terutama Frequency, banyak
     # customer yang cuma belanja 1x) tidak bikin error "Bin edges must be
-    # unique" — sesuai bug watchlist di CLAUDE.md.
+    # unique" — sesuai daftar bug yang diantisipasi di awal proyek.
     #
     # Recency  : makin kecil (belanja baru-baru ini) makin bagus -> label dibalik.
     rfm["R_score"] = pd.qcut(

@@ -7,6 +7,8 @@ pelanggan yang berhenti dari yang masih aktif.
 
 **Stack:** Python (pandas, matplotlib, seaborn, scipy) · SQL/SQLite · Jupyter
 
+**Dashboard interaktif:** [buka di browser](https://samuel-geraldo.github.io/rfm-cohort-ecommerce/) (empat halaman, filter wilayah dan status churn).
+
 ---
 
 ## Latar Belakang
@@ -86,7 +88,7 @@ keputusannya bisa dibuktikan ulang, bukan cuma diklaim di sini.
 
 ### Cleaning
 
-Urutannya dikunci di [`CLAUDE.md`](CLAUDE.md). Tiap langkah yang membuang
+Urutannya dikunci sejak awal proyek dan tidak diubah. Tiap langkah yang membuang
 baris mencatat berapa baris dan berapa persen revenue yang ikut hilang —
 supaya jelas apa yang dibuang, bukan sekadar "data sudah dibersihkan".
 
@@ -374,8 +376,9 @@ rfm-cohort-ecommerce/
 │   └── figures/
 ├── notebooks/analisis_lanjutan.ipynb
 ├── docs/bugs.md
+├── index.html                 # mengarahkan alamat utama GitHub Pages ke dashboard
 ├── requirements.txt
-└── CLAUDE.md
+└── LICENSE                    # MIT (kode)
 ```
 
 ---
@@ -458,6 +461,14 @@ bisa diulang.
 - Batas quintile RFM sensitif terhadap penumpukan nilai pada Frequency (lihat
   bug ketiga di atas). Pelanggan yang persis di garis batas bisa bergeser satu
   bucket tergantung urutan tie-break.
+
+---
+
+## Lisensi
+
+Kode di repo ini berlisensi MIT (lihat `LICENSE`). Datanya milik penyusun aslinya,
+[UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii),
+dan tidak ikut disertakan di repo ini.
 
 ---
 

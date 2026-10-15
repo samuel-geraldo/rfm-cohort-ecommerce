@@ -2,7 +2,7 @@
 01_load_clean.py
 
 Baca data mentah Online Retail II (dua sheet, digabung), lalu bersihkan
-sesuai urutan yang sudah dikunci di CLAUDE.md — urutan ini tidak boleh
+sesuai urutan yang sudah dikunci di awal proyek — urutan ini tidak boleh
 diubah tanpa diskusi. Hasil akhir disimpan ke data/processed/retail_bersih.parquet.
 
 Setiap langkah yang membuang baris mencetak jumlah baris sebelum & sesudah,

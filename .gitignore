@@ -23,3 +23,6 @@ __pycache__/
 
 # Konfigurasi lokal Claude Code
 .claude/
+
+# File konfigurasi asisten AI (lokal)
+CLAUDE.md
