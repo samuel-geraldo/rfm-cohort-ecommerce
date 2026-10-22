@@ -723,6 +723,9 @@ const PAGE_CSS = `
 .rf-run button:hover{border-color:var(--anatomy-hi)}
 .rf-run button:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:3px}
 .rf-run button[aria-busy="true"]{opacity:.55;cursor:progress}
+.rf-pick,.rf-auto{display:flex;align-items:center;gap:6px;color:var(--anatomy-muted);font:11.5px/1 var(--anatomy-mono)}
+.rf-pick select{font:inherit;color:var(--anatomy-strong);background:var(--anatomy-card);border:1px solid var(--anatomy-mid);border-radius:2px;padding:7px 6px;max-width:100%}
+.rf-auto input{accent-color:var(--rf-aksen);margin:0}
 .rf-run p{margin:0;color:var(--anatomy-muted);font-family:var(--anatomy-mono);font-size:11.5px}
 .rf-board[data-board="ex"]{margin-top:10px}
 .rf-board[data-board="ex"]>div[data-wait] b,.rf-board[data-board="ex"]>div[data-wait] i{color:var(--anatomy-lo)}
@@ -746,7 +749,8 @@ const segBoard = `<div class="rf-board" data-board="seg" aria-hidden="true">
 <div><span>Per customer</span><b data-v="ratio">${s0.ratio} rata-rata</b><i data-v="perCustomer">${s0.perCustomer}</i></div>
 <div><span>Tipikal (median)</span><b data-v="median">${s0.median}</b><i data-v="medianSub">${s0.medianSub}</i></div>
 </div>`;
-const exBoard = `<div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><p data-v="exStatus" aria-live="polite">5 token di magasin = 5 contoh customer dari data</p></div>
+const pickOptions = EX_VIEW.map((ex, i) => `<option value="${i}">#${ex.no} · ${ex.values.join(" · ")} · ${ex.segment}</option>`).join("");
+const exBoard = `<div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><label class="rf-pick"><span>Contoh</span><select data-pick>${pickOptions}</select></label><label class="rf-auto"><input type="checkbox" data-auto checked> Putar otomatis</label><p data-v="exStatus" aria-live="polite">5 token di magasin = 5 contoh customer dari data</p></div>
 <div class="rf-board" data-board="ex" aria-hidden="true">
 <div data-wait><span>Contoh</span><b data-v="exNo">—</b><i>dari ${EXAMPLES.length} customer</i></div>
 <div data-wait><span>Recency → R</span><b data-v="ex0">—</b><i data-v="exb0">gerbang R</i></div>

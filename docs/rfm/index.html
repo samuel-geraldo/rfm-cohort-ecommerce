@@ -145,6 +145,9 @@ body{margin:0;background:var(--anatomy-page);color:var(--anatomy-text);font:14px
 .rf-run button:hover{border-color:var(--anatomy-hi)}
 .rf-run button:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:3px}
 .rf-run button[aria-busy="true"]{opacity:.55;cursor:progress}
+.rf-pick,.rf-auto{display:flex;align-items:center;gap:6px;color:var(--anatomy-muted);font:11.5px/1 var(--anatomy-mono)}
+.rf-pick select{font:inherit;color:var(--anatomy-strong);background:var(--anatomy-card);border:1px solid var(--anatomy-mid);border-radius:2px;padding:7px 6px;max-width:100%}
+.rf-auto input{accent-color:var(--rf-aksen);margin:0}
 .rf-run p{margin:0;color:var(--anatomy-muted);font-family:var(--anatomy-mono);font-size:11.5px}
 .rf-board[data-board="ex"]{margin-top:10px}
 .rf-board[data-board="ex"]>div[data-wait] b,.rf-board[data-board="ex"]>div[data-wait] i{color:var(--anatomy-lo)}
@@ -163,7 +166,7 @@ body{margin:0;background:var(--anatomy-page);color:var(--anatomy-text);font:14px
 <div><span>Revenue</span><b data-v="pctRevenue">51,52%</b><i data-v="revenue">£8,80 juta</i></div>
 <div><span>Per customer</span><b data-v="ratio">3,6× rata-rata</b><i data-v="perCustomer">£10.597 vs £2.913</i></div>
 <div><span>Tipikal (median)</span><b data-v="median">12× belanja</b><i data-v="medianSub">terakhir 8 hari lalu · £3.952</i></div>
-</div><div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><p data-v="exStatus" aria-live="polite">5 token di magasin = 5 contoh customer dari data</p></div>
+</div><div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><label class="rf-pick"><span>Contoh</span><select data-pick><option value="0">#1 · 4 hari · 10× · £3.965 · Champions</option><option value="1">#2 · 85 hari · 6× · £2.475 · Loyal Customers</option><option value="2">#3 · 311 hari · 3× · £928 · At Risk</option><option value="3">#4 · 429 hari · 2× · £273 · Hibernating</option><option value="4">#5 · 7 hari · 1× · £270 · New Customers</option></select></label><label class="rf-auto"><input type="checkbox" data-auto checked> Putar otomatis</label><p data-v="exStatus" aria-live="polite">5 token di magasin = 5 contoh customer dari data</p></div>
 <div class="rf-board" data-board="ex" aria-hidden="true">
 <div data-wait><span>Contoh</span><b data-v="exNo">—</b><i>dari 5 customer</i></div>
 <div data-wait><span>Recency → R</span><b data-v="ex0">—</b><i data-v="exb0">gerbang R</i></div>
@@ -957,6 +960,8 @@ const readout = document.querySelector("[data-readout]");
 const v = Object.fromEntries([...document.querySelectorAll("[data-v]")].map((el) => [el.dataset.v, el]));
 const exCells = [...document.querySelectorAll('[data-board="ex"] > div')];
 const runButton = document.querySelector("[data-run]");
+const pickSelect = document.querySelector("[data-pick]");
+const autoBox = document.querySelector("[data-auto]");
 const part = (name) => svg.querySelector(`[data-part="${name}"]`);
 const bridge = part("bridge");
 const carriage = part("carriage");
@@ -983,6 +988,7 @@ const state = {
   magRise: 1,
   needle: D.dials.map(() => D.rest),
   needleGoal: D.dials.map(() => D.rest),
+  auto: !still.matches,
   touring: !still.matches,
   wait: 1.4,
   clock: 0,
@@ -1068,6 +1074,7 @@ function startRun() {
   if (state.run) return false;
   const e = state.next;
   state.next = (e + 1) % D.ex.length;
+  if (pickSelect) pickSelect.value = String(state.next);
   if (state.magN === 0) state.magN = D.magCount;
   state.magN -= 1;
   const target = D.targets[e];
@@ -1162,7 +1169,7 @@ function tick(now) {
   last = now;
   const calm = still.matches;
   state.clock += dt;
-  if (!state.touring && !calm && !state.run && state.clock - state.lastInput > 8) {
+  if (state.auto && !state.touring && !calm && !state.run && state.clock - state.lastInput > 8) {
     state.touring = true;
     state.wait = 0.6;
   }
@@ -1285,6 +1292,20 @@ stage.addEventListener("keydown", (event) => {
 });
 stage.addEventListener("focus", () => describe(state.sel));
 runButton.addEventListener("click", userRun);
+// Pilihan contoh: tombol menjalankan contoh yang tampil di daftar, lalu lanjut berurutan dari situ.
+if (pickSelect) pickSelect.addEventListener("change", () => {
+  touched();
+  state.next = Number(pickSelect.value);
+});
+// Putar otomatis: mati = figur diam sampai tombol ditekan; hidup lagi = tur langsung jalan.
+if (autoBox) autoBox.addEventListener("change", () => {
+  state.auto = autoBox.checked;
+  state.touring = state.auto && !still.matches;
+  state.wait = 0.6;
+  // Dimatikan saat contoh berjalan: lompat ke akhir supaya langsung berhenti dengan token sudah mendarat.
+  if (!state.auto && state.run) state.run.t = state.run.plan.total;
+  kick();
+});
 new IntersectionObserver(
   (entries) => {
     visible = entries[entries.length - 1].isIntersecting;

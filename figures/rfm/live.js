@@ -8,6 +8,8 @@ const readout = document.querySelector("[data-readout]");
 const v = Object.fromEntries([...document.querySelectorAll("[data-v]")].map((el) => [el.dataset.v, el]));
 const exCells = [...document.querySelectorAll('[data-board="ex"] > div')];
 const runButton = document.querySelector("[data-run]");
+const pickSelect = document.querySelector("[data-pick]");
+const autoBox = document.querySelector("[data-auto]");
 const part = (name) => svg.querySelector(`[data-part="${name}"]`);
 const bridge = part("bridge");
 const carriage = part("carriage");
@@ -34,6 +36,7 @@ const state = {
   magRise: 1,
   needle: D.dials.map(() => D.rest),
   needleGoal: D.dials.map(() => D.rest),
+  auto: !still.matches,
   touring: !still.matches,
   wait: 1.4,
   clock: 0,
@@ -119,6 +122,7 @@ function startRun() {
   if (state.run) return false;
   const e = state.next;
   state.next = (e + 1) % D.ex.length;
+  if (pickSelect) pickSelect.value = String(state.next);
   if (state.magN === 0) state.magN = D.magCount;
   state.magN -= 1;
   const target = D.targets[e];
@@ -213,7 +217,7 @@ function tick(now) {
   last = now;
   const calm = still.matches;
   state.clock += dt;
-  if (!state.touring && !calm && !state.run && state.clock - state.lastInput > 8) {
+  if (state.auto && !state.touring && !calm && !state.run && state.clock - state.lastInput > 8) {
     state.touring = true;
     state.wait = 0.6;
   }
@@ -336,6 +340,20 @@ stage.addEventListener("keydown", (event) => {
 });
 stage.addEventListener("focus", () => describe(state.sel));
 runButton.addEventListener("click", userRun);
+// Pilihan contoh: tombol menjalankan contoh yang tampil di daftar, lalu lanjut berurutan dari situ.
+if (pickSelect) pickSelect.addEventListener("change", () => {
+  touched();
+  state.next = Number(pickSelect.value);
+});
+// Putar otomatis: mati = figur diam sampai tombol ditekan; hidup lagi = tur langsung jalan.
+if (autoBox) autoBox.addEventListener("change", () => {
+  state.auto = autoBox.checked;
+  state.touring = state.auto && !still.matches;
+  state.wait = 0.6;
+  // Dimatikan saat contoh berjalan: lompat ke akhir supaya langsung berhenti dengan token sudah mendarat.
+  if (!state.auto && state.run) state.run.t = state.run.plan.total;
+  kick();
+});
 new IntersectionObserver(
   (entries) => {
     visible = entries[entries.length - 1].isIntersecting;
