@@ -7,6 +7,20 @@ data/raw/*
 
 # Virtual environment
 venv/
+.venv/
+
+# Kredensial dan konfigurasi lokal — jangan pernah dicommit (pakai environment variable)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Node (figur RFM tidak punya dependensi, tapi berjaga-jaga)
+node_modules/
+
+# Log lokal (mis. keluaran audit figur)
+*.log
 
 # Database SQLite hasil generate (build artifact dari data/processed, besar)
 sql/retail.db
