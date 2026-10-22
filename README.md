@@ -216,6 +216,41 @@ lalu Hibernating (£619 ribu) dan Can't Lose (£581 ribu). Rata-rata per custome
 churn di Can't Lose £7.958 dibanding £409 di Hibernating, jadi 73 pelanggan
 Can't Lose membawa nilai hampir sama dengan 1.515 pelanggan Hibernating.
 
+#### Seberapa stabil segmentasinya
+
+`python src/10_sensitivitas.py` menghitung ulang skor R dan F dengan cara lain
+lalu menghitung berapa pelanggan pindah segmen dibanding hasil `02_rfm.py`
+(hasil di `output/sensitivity_summary.csv` dan `sensitivity_per_segment.csv`).
+
+| Skenario | Pelanggan pindah segmen | F_score berubah | Revenue Champions |
+|---|---:|---:|---:|
+| Baseline (`02_rfm.py`) | — | — | 51,52% |
+| Urutan tie-break diacak, 200 kali (rata-rata) | 8,97% | 22,30% | 51,55% |
+| Urutan tie-break diacak (terburuk) | 9,69% | 22,90% | 51,50% |
+| Nilai sama selalu satu skor (rank min) | 6,67% | 15,94% | 51,76% |
+| Nilai sama selalu satu skor (rank max) | 15,48% | 39,24% | 51,71% |
+| Ambang tetap bisnis (Recency 30/90/180/365 hari, Frequency 1/2/3–4/5–9/10+) | 17,16% | 18,58% | 60,13% |
+
+Bacaannya:
+
+- **Yang goyah adalah Frequency, bukan Recency.** Dengan urutan tie-break
+  diacak, F_score berubah di sekitar 22% pelanggan sedangkan R_score hanya
+  0,73%. Angka ini sejalan dengan selisih 23,78% antara SQL dan Python di
+  bug ketiga: penyebabnya sama, yaitu 1.625 pelanggan dengan Frequency = 1.
+- **Segmen besar dan bernilai stabil.** Anggota Champions yang tetap di
+  segmennya rata-rata 97,5%, Hibernating 94,1%, Loyal Customers 94,1%, dan
+  Can't Lose 93,9%. **Segmen kecil rapuh:** New Customers hanya 70,0% (terburuk
+  46,3%), Promising 71,4%, dan Need Attention 77,1%. Segmen-segmen ini kecil
+  (54, 114, dan 269 pelanggan), jadi beberapa pelanggan di garis batas sudah
+  mengubah persentasenya.
+- **Temuan utama tidak bergantung pada cara menghitung.** Champions menyumbang
+  lebih dari separuh revenue di semua skenario (51,5% sampai 60,1%).
+- **Dua skenario perlu dibaca dengan hati-hati.** Pada rank max, New
+  Customers dan Promising hilang seluruhnya: 1.625 pelanggan ber-Frequency 1
+  (27,7%) tidak muat di satu quintile, jadi skor F=1 tidak pernah terbentuk.
+  Skenario ambang tetap bukan ukuran kesalahan melainkan definisi lain: ia
+  membuat Champions menyumbang 60,1%, bukan 51,5%, karena batasnya berbeda.
+
 ### 2. Retention anjlok di bulan pertama, lalu mendatar
 
 ![Cohort Retention Heatmap](output/figures/cohort_retention_heatmap.png)
@@ -397,6 +432,7 @@ rfm-cohort-ecommerce/
 │   ├── 07_powerbi_data.py        # paket impor Power BI
 │   ├── 08_export_figur.py        # angka untuk figur RFM (output/figur/)
 │   ├── 09_churn_segmen.py        # churn dan nilai churned per segmen RFM
+│   ├── 10_sensitivitas.py        # uji sensitivitas skor RFM (tie-break, ambang tetap)
 │   ├── figur_rfm/                # sumber build figur RFM (kit Anatomy, MIT)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
@@ -411,6 +447,8 @@ rfm-cohort-ecommerce/
 │   ├── cohort_matrix.csv
 │   ├── churn_summary.csv
 │   ├── churn_per_segment.csv
+│   ├── sensitivity_summary.csv
+│   ├── sensitivity_per_segment.csv
 │   ├── segment_summary.csv
 │   ├── figur/rfm_segments.json   # ringkasan segmen untuk figur RFM
 │   └── figures/
@@ -455,6 +493,7 @@ python src/03_cohort.py
 python src/04_churn_geo.py
 python src/05_export_figures.py
 python src/09_churn_segmen.py    # churn per segmen RFM, butuh hasil 04
+python src/10_sensitivitas.py    # uji sensitivitas skor RFM, butuh hasil 02
 ```
 
 **4. Bangun database SQLite dan jalankan query**
@@ -510,7 +549,9 @@ bisa diulang.
   jadi tidak ada klaim sebab-akibat.
 - Batas quintile RFM sensitif terhadap penumpukan nilai pada Frequency (lihat
   bug ketiga di atas). Pelanggan yang persis di garis batas bisa bergeser satu
-  bucket tergantung urutan tie-break.
+  bucket tergantung urutan tie-break. Besarnya sudah diukur di
+  `src/10_sensitivitas.py`: sekitar 9% pelanggan pindah segmen, terutama di
+  segmen kecil seperti New Customers dan Promising.
 
 ---
 
