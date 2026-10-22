@@ -1,6 +1,6 @@
 // Gerak halaman (disisipkan apa adanya oleh build.mjs setelah kit dan motion.mjs).
 // Pilih segmen (klik atau panah), jalankan satu contoh customer (tombol, Enter, tombol di mesin),
-// dan tur saat diam yang menjalankan kelima contoh bergantian.
+// dan tur saat diam yang menjalankan semua contoh bergantian.
 
 const stage = document.querySelector(".iso-stage");
 const svg = stage.querySelector("svg");

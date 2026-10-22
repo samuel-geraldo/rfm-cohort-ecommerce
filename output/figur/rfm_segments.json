@@ -528,6 +528,56 @@
    "f": 1,
    "m": 1,
    "segment": "New Customers"
+  },
+  {
+   "customer_no": 6,
+   "recency_days": 49,
+   "frequency": 2,
+   "monetary": 677.72,
+   "r": 4,
+   "f": 2,
+   "m": 3,
+   "segment": "Potential Loyalists"
+  },
+  {
+   "customer_no": 7,
+   "recency_days": 430,
+   "frequency": 11,
+   "monetary": 3881.89,
+   "r": 1,
+   "f": 5,
+   "m": 5,
+   "segment": "Can't Lose"
+  },
+  {
+   "customer_no": 8,
+   "recency_days": 73,
+   "frequency": 2,
+   "monetary": 927.03,
+   "r": 3,
+   "f": 3,
+   "m": 3,
+   "segment": "Need Attention"
+  },
+  {
+   "customer_no": 9,
+   "recency_days": 133,
+   "frequency": 1,
+   "monetary": 358.82,
+   "r": 3,
+   "f": 1,
+   "m": 2,
+   "segment": "About To Sleep"
+  },
+  {
+   "customer_no": 10,
+   "recency_days": 23,
+   "frequency": 1,
+   "monetary": 223.85,
+   "r": 4,
+   "f": 1,
+   "m": 1,
+   "segment": "Promising"
   }
  ]
 }

@@ -13,7 +13,7 @@ Isi JSON:
               segmen), diambil dari hasilnya, bukan diketik ulang.
 - score_bins: per dimensi dan skor 1-5 -> jumlah customer dan rentang nilai
               mentah (batas quintile yang sebenarnya).
-- examples  : 5 contoh customer, ID asli diganti nomor urut.
+- examples  : 10 contoh customer (satu per segmen), ID asli diganti nomor urut.
 
 Dijalankan dari root repo: python src/export_figure_data.py
 """
@@ -42,8 +42,12 @@ ACUAN = {
     "New Customers": (54, 0.92, 0.11),
 }
 
-# Segmen asal 5 contoh customer yang dijalankan lewat gerbang di figur.
-SEGMEN_CONTOH = ["Champions", "Loyal Customers", "At Risk", "Hibernating", "New Customers"]
+# Segmen asal contoh customer yang dijalankan lewat gerbang di figur: satu per segmen.
+# Lima pertama tetap di urutan semula supaya nomor contoh #1-#5 tidak berubah.
+SEGMEN_CONTOH = [
+    "Champions", "Loyal Customers", "At Risk", "Hibernating", "New Customers",
+    "Potential Loyalists", "Can't Lose", "Need Attention", "About To Sleep", "Promising",
+]
 
 # Kolom nilai mentah untuk tiap skor.
 DIMENSI = {"R": "Recency", "F": "Frequency", "M": "Monetary"}
