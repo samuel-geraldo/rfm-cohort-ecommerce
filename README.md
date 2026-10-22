@@ -367,17 +367,15 @@ rfm-cohort-ecommerce/
 │   ├── 05_export_figures.py      # export chart ke PNG
 │   ├── 06_dashboard.py           # dashboard interaktif (HTML)
 │   ├── 07_powerbi_data.py        # paket impor Power BI
-│   ├── 08_export_figur.py     # angka untuk figur RFM (output/figur/)
+│   ├── 08_export_figur.py        # angka untuk figur RFM (output/figur/)
+│   ├── figur_rfm/                # sumber build figur RFM (kit Anatomy, MIT)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
 │   ├── buat_database.py          # muat parquet ke SQLite
 │   └── queries.sql               # NTILE, LAG, CTE bertingkat, self-join
 ├── dashboard/
 │   ├── customer_analytics.html
-│   ├── preview-0-pengantar.png   # tangkapan layar tiap halaman
-│   ├── preview-1-ringkasan.png
-│   ├── preview-2-segmen.png
-│   ├── preview-3-cohort.png
+│   ├── preview/                  # tangkapan layar tiap halaman (preview-0 sampai preview-3)
 │   └── powerbi/                  # CSV, measures.dax, theme.json, panduan
 ├── output/
 │   ├── rfm_table.csv
@@ -390,7 +388,6 @@ rfm-cohort-ecommerce/
 ├── docs/
 │   ├── bugs.md
 │   └── rfm/                      # figur interaktif segmentasi RFM (GitHub Pages)
-├── src/figur_rfm/                  # sumber build figur RFM (kit Anatomy, MIT)
 ├── index.html                 # mengarahkan alamat utama GitHub Pages ke dashboard
 ├── requirements.txt
 └── LICENSE                    # MIT (kode)
