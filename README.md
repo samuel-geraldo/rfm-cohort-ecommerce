@@ -121,7 +121,7 @@ luasnya sebanding jumlah pelanggan, dan sekat mengelompokkan sel menjadi 10
 segmen. Gulungan koin menunjukkan revenue (satu gulungan penuh = £1 juta),
 jadi kotak Champions yang berukuran sedang penuh uang, sedangkan Hibernating
 yang kotaknya paling luas hampir kosong. Klik gambar untuk versi interaktif:
-pilih segmen, atau jalankan salah satu dari 5 contoh pelanggan melewati
+pilih segmen, atau jalankan salah satu dari 10 contoh pelanggan (satu per segmen) melewati
 gerbang R, F, M sampai jatuh ke selnya.
 
 ### Cohort Analysis

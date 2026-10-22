@@ -2,7 +2,7 @@
 //
 // Semua angka dibaca dari output/figur/rfm_segments.json (hasil src/export_figure_data.py):
 // luas tiap sel laci = jumlah customer di kombinasi skor R x F itu, jumlah gulungan koin =
-// revenue segmen (satu gulungan penuh = £1 juta), dan 5 token di magasin = 5 contoh customer.
+// revenue segmen (satu gulungan penuh = £1 juta), dan 10 token di magasin = 10 contoh customer (satu per segmen).
 //
 //   node figures/rfm/build.mjs           -> docs/rfm/index.html + docs/rfm/rfm-figure.svg
 //   node figures/rfm/build.mjs --audit   -> juga cek urutan gambar & tumpuan di banyak pose (kit/audit.mjs)
@@ -119,18 +119,20 @@ const ROLLS = SEGMENTS.map((seg) => {
 const TARGETS = EXAMPLES.map((ex) => {
   const cell = CELLS.find((c) => c.r === ex.r && c.f === ex.f);
   const { rolls } = ROLLS[SEG_INDEX.get(ex.segment)];
-  const pad = TOKEN_R + 1.2;
+  // Jarak aman ke sekat: 1,2 normal; sel yang terlalu sempit (mis. kolom F5) dilonggarkan jadi 0,6.
+  const padFor = (size) => TOKEN_R + (size >= 2 * (TOKEN_R + 1.2) ? 1.2 : 0.6);
+  const [padX, padY] = [padFor(cell.w), padFor(cell.d)];
   const need = COIN_R + TOKEN_R + 1.4;
   const centre = [cell.x + cell.w / 2, cell.y + cell.d / 2];
   let best = null;
-  for (let x = cell.x + pad; x <= cell.x + cell.w - pad + 1e-9; x += 0.5) {
-    for (let y = cell.y + pad; y <= cell.y + cell.d - pad + 1e-9; y += 0.5) {
+  for (let x = cell.x + padX; x <= cell.x + cell.w - padX + 1e-9; x += 0.5) {
+    for (let y = cell.y + padY; y <= cell.y + cell.d - padY + 1e-9; y += 0.5) {
       if (rolls.some((roll) => Math.hypot(x - roll.cx, y - roll.cy) < need)) continue;
       const score = Math.hypot(x - centre[0], y - centre[1]);
       if (!best || score < best.score) best = { x, y, score };
     }
   }
-  if (!best) throw new Error(`contoh #${ex.customer_no}: tidak ada ruang di sel R${ex.r}F${ex.f}`);
+  if (!best) throw new Error(`contoh #${ex.customer_no}: tidak ada ruang di sel R${ex.r}F${ex.f} (${cell.w.toFixed(1)} × ${cell.d.toFixed(1)}, perlu ≥ ${(2 * padX).toFixed(1)} × ${(2 * padY).toFixed(1)})`);
   return { ex, cell, x: best.x, y: best.y, seg: SEG_INDEX.get(ex.segment) };
 });
 
@@ -186,7 +188,9 @@ function magazineSvg(K, P, M, n, rise) {
   for (let i = 0; i < n; i++) out += K.solidSvg(K.cylinder(M.x, M.y, 3, plate + i * M.token, M.token, P, 32, 0.3), { tone: "hi" }) + K.lineSvg(K.ring(M.x, M.y, 2, plate + (i + 1) * M.token, P, 24), { tone: "lo" });
   return out;
 }
-const MAG = { x: X_HOME, y: Y_HOME, top: HEAD_Z, token: TOKEN_H, cup: 11.4 };
+// cup = bibir mangkuk; harus di bawah dasar tumpukan penuh (HEAD_Z - 10 × TOKEN_H - 0,6).
+const MAG = { x: X_HOME, y: Y_HOME, top: HEAD_Z, token: TOKEN_H, cup: 8 };
+const MAG_CUP_BASE = 5; // dasar mangkuk di atas kolom
 function magazineShapes(n, rise) {
   const top = MAG.top - (1 - rise) * MAG.token;
   const plate = top - n * MAG.token;
@@ -367,7 +371,7 @@ function staticItems() {
     );
   });
 
-  // Magasin: 5 token = 5 contoh customer di JSON, didorong ke atas oleh batang.
+  // Magasin: 10 token = 10 contoh customer di JSON, didorong ke atas oleh batang.
   {
     const [x, y] = [X_HOME, Y_HOME];
     const foot = { x: x - 8, y: y - 8.5, w: 16, d: 15, r: 1.6 };
@@ -377,13 +381,13 @@ function staticItems() {
       "magazine.stand",
       S(k.slabOf(foot, 0, 1.4, P, 3, 0.4), { tone: "lo" }) +
         screws(foot, 1.4, 2, 0.4) +
-        S(k.cylinder(x, y, 3.2, 1.4, 8, P, 28), { tone: "mid", inner: L(k.sideArc(x, y, 3.2, 5.4, P, 24), { tone: "faint" }) }) +
-        S(k.cylinder(x, y, 6, 9.4, MAG.cup - 9.4, P, 40, 0.4), { tone: "mid" }) +
+        S(k.cylinder(x, y, 3.2, 1.4, MAG_CUP_BASE - 1.4, P, 28), { tone: "mid", inner: L(k.sideArc(x, y, 3.2, 3.2, P, 24), { tone: "faint" }) }) +
+        S(k.cylinder(x, y, 6, MAG_CUP_BASE, MAG.cup - MAG_CUP_BASE, P, 40, 0.4), { tone: "mid" }) +
         byDepth(posts).map(([px, py]) => S(k.cylinder(px, py, 0.75, MAG.cup, postTop - MAG.cup, P, 12), { tone: "mid", crease: "none" }) + D([at([px, py, postTop])], { size: 0.35 })).join(""),
       [
         A.slab(foot, 0, 1.4, { name: "magazine.foot" }, 3),
-        A.cylinder(x, y, 3.2, 1.4, 8, { name: "magazine.column" }),
-        A.cylinder(x, y, 6, 9.4, MAG.cup - 9.4, { name: "magazine.cup" }),
+        A.cylinder(x, y, 3.2, 1.4, MAG_CUP_BASE - 1.4, { name: "magazine.column" }),
+        A.cylinder(x, y, 6, MAG_CUP_BASE, MAG.cup - MAG_CUP_BASE, { name: "magazine.cup" }),
         ...posts.map(([px, py], index) => A.cylinder(px, py, 0.75, MAG.cup, postTop - MAG.cup, { name: `magazine.post${index}` })),
       ],
       { at: [x, y - 2, 10] },
@@ -683,7 +687,7 @@ function pageBody(selected, { token }) {
   return body.join("");
 }
 
-const LABEL = `Mesin sortir customer di atas laci RFM. Laci dibagi menjadi 25 sel skor R kali F yang luasnya sebanding jumlah customer, dikelompokkan sekat menjadi 10 segmen. Gulungan koin di tiap kotak menunjukkan revenue segmen. Lima token di magasin adalah contoh customer yang diukur tiga gerbang R, F, M lalu dijatuhkan gantry ke selnya.`;
+const LABEL = `Mesin sortir customer di atas laci RFM. Laci dibagi menjadi 25 sel skor R kali F yang luasnya sebanding jumlah customer, dikelompokkan sekat menjadi 10 segmen. Gulungan koin di tiap kotak menunjukkan revenue segmen. Sepuluh token di magasin adalah contoh customer, satu per segmen, yang diukur tiga gerbang R, F, M lalu dijatuhkan gantry ke selnya.`;
 
 const svg = k.figureSvg({ width: WIDTH, height: HEIGHT, label: LABEL, body: pageBody(SEG_INDEX.get("Champions"), { token: true }) });
 
@@ -750,7 +754,7 @@ const segBoard = `<div class="rf-board" data-board="seg" aria-hidden="true">
 <div><span>Tipikal (median)</span><b data-v="median">${s0.median}</b><i data-v="medianSub">${s0.medianSub}</i></div>
 </div>`;
 const pickOptions = EX_VIEW.map((ex, i) => `<option value="${i}">#${ex.no} · ${ex.values.join(" · ")} · ${ex.segment}</option>`).join("");
-const exBoard = `<div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><label class="rf-pick"><span>Contoh</span><select data-pick>${pickOptions}</select></label><label class="rf-auto"><input type="checkbox" data-auto checked> Putar otomatis</label><p data-v="exStatus" aria-live="polite">5 token di magasin = 5 contoh customer dari data</p></div>
+const exBoard = `<div class="rf-run"><button type="button" data-run>Jalankan contoh customer</button><label class="rf-pick"><span>Contoh</span><select data-pick>${pickOptions}</select></label><label class="rf-auto"><input type="checkbox" data-auto checked> Putar otomatis</label><p data-v="exStatus" aria-live="polite">${EXAMPLES.length} token di magasin = ${EXAMPLES.length} contoh customer, satu per segmen</p></div>
 <div class="rf-board" data-board="ex" aria-hidden="true">
 <div data-wait><span>Contoh</span><b data-v="exNo">—</b><i>dari ${EXAMPLES.length} customer</i></div>
 <div data-wait><span>Recency → R</span><b data-v="ex0">—</b><i data-v="exb0">gerbang R</i></div>
@@ -767,7 +771,7 @@ const keys = [
   ["lit", "Bergaris hitam (menyala): token yang sedang berjalan, atau segmen yang dipilih"],
 ];
 const legendKeys = keys.map(([mark, label]) => `<span class="iso-key">${swatch(mark)}${label}</span>`).join("");
-const caption = `Laci dibagi menjadi 25 sel, satu untuk tiap kombinasi skor R (baris; makin ke belakang makin baru belanja) dan skor F (kolom; makin ke kanan makin sering). Luas tiap sel sebanding jumlah customer-nya, total ${fmtInt(META.total_customers)}. Sekat tebal mengelompokkan sel menjadi ${SEGMENTS.length} segmen menurut aturan di src/02_rfm.py, yang hanya memakai skor R dan F. Lima token di magasin adalah contoh customer: gerbang R, F, M mengubah nilainya menjadi skor 1–5 (quintile, tiap skor ±20% customer), lalu gantry menjatuhkannya ke sel R × F-nya. Skor M dicatat, tetapi tidak menggeser token.`;
+const caption = `Laci dibagi menjadi 25 sel, satu untuk tiap kombinasi skor R (baris; makin ke belakang makin baru belanja) dan skor F (kolom; makin ke kanan makin sering). Luas tiap sel sebanding jumlah customer-nya, total ${fmtInt(META.total_customers)}. Sekat tebal mengelompokkan sel menjadi ${SEGMENTS.length} segmen menurut aturan di src/02_rfm.py, yang hanya memakai skor R dan F. Sepuluh token di magasin adalah contoh customer (satu per segmen): gerbang R, F, M mengubah nilainya menjadi skor 1–5 (quintile, tiap skor ±20% customer), lalu gantry menjatuhkannya ke sel R × F-nya. Skor M dicatat, tetapi tidak menggeser token.`;
 
 const plate = k
   .plateHtml({
