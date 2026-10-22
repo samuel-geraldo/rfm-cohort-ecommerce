@@ -188,6 +188,34 @@ dengan Recency rata-rata 327 hari. Ini pelanggan yang dulu sangat aktif lalu
 berhenti. Jumlahnya kecil sehingga penanganannya murah, dan nilainya sudah
 terbukti.
 
+#### Tindakan per segmen
+
+Ini usulan, bukan hasil uji: data transaksi tidak memuat biaya kampanye atau
+respons pelanggan, jadi efek tindakannya tidak bisa diukur di sini.
+
+| Segment | Kondisi | Usulan tindakan |
+|---|---|---|
+| Champions | paling sering dan paling besar belanjanya | jaga: akses awal produk baru, program loyalitas; tidak perlu diskon |
+| Loyal Customers | rutin belanja, nilai tinggi | dorong naik ke Champions lewat bundling atau penawaran frekuensi |
+| Potential Loyalists | belanja baru-baru ini, frekuensi masih rendah | ajak order kedua dan ketiga dengan rekomendasi produk |
+| New Customers | baru, satu order | email sambutan dan insentif order kedua |
+| Promising | baru, nilai kecil | sama seperti New Customers, tanpa insentif besar |
+| Need Attention | di tengah dan mulai surut | pengingat ringan sebelum Recency melewati 180 hari |
+| About To Sleep | mulai lama tidak belanja, frekuensi rendah | pengingat berbasis produk terakhir yang dibeli |
+| At Risk | sudah lewat 180 hari, dulu cukup sering belanja | win-back dengan penawaran terarah |
+| Can't Lose | sudah lewat 180 hari, dulu sangat aktif | prioritas pertama: kontak personal, bukan email massal |
+| Hibernating | sudah lewat 180 hari, jarang belanja | otomatis berbiaya rendah saja, atau dilepas |
+
+Churn per segmen (`python src/09_churn_segmen.py`, hasil di
+`output/churn_per_segment.csv`) perlu dibaca hati-hati. At Risk, Can't Lose, dan
+Hibernating **100% churn**, tapi itu konsekuensi definisi, bukan temuan: churn
+didefinisikan Recency > 180 hari, dan ketiga segmen itu memang berskor R
+rendah. Yang bermakna adalah nilainya: customer yang sudah churn membawa
+£2,30 juta (13,43% dari seluruh revenue), terbesar dari At Risk (£1,01 juta),
+lalu Hibernating (£619 ribu) dan Can't Lose (£581 ribu). Rata-rata per customer
+churn di Can't Lose £7.958 dibanding £409 di Hibernating, jadi 73 pelanggan
+Can't Lose membawa nilai hampir sama dengan 1.515 pelanggan Hibernating.
+
 ### 2. Retention anjlok di bulan pertama, lalu mendatar
 
 ![Cohort Retention Heatmap](output/figures/cohort_retention_heatmap.png)
@@ -368,6 +396,7 @@ rfm-cohort-ecommerce/
 │   ├── 06_dashboard.py           # dashboard interaktif (HTML)
 │   ├── 07_powerbi_data.py        # paket impor Power BI
 │   ├── 08_export_figur.py        # angka untuk figur RFM (output/figur/)
+│   ├── 09_churn_segmen.py        # churn dan nilai churned per segmen RFM
 │   ├── figur_rfm/                # sumber build figur RFM (kit Anatomy, MIT)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
@@ -381,6 +410,7 @@ rfm-cohort-ecommerce/
 │   ├── rfm_table.csv
 │   ├── cohort_matrix.csv
 │   ├── churn_summary.csv
+│   ├── churn_per_segment.csv
 │   ├── segment_summary.csv
 │   ├── figur/rfm_segments.json   # ringkasan segmen untuk figur RFM
 │   └── figures/
@@ -424,6 +454,7 @@ python src/02_rfm.py
 python src/03_cohort.py
 python src/04_churn_geo.py
 python src/05_export_figures.py
+python src/09_churn_segmen.py    # churn per segmen RFM, butuh hasil 04
 ```
 
 **4. Bangun database SQLite dan jalankan query**
