@@ -1,0 +1,11 @@
+Segment,Jumlah_customer,Churned_customer,Persen_churn,Monetary_churned,Persen_monetary_churned,Rata2_monetary_churned,Persen_dari_total_monetary
+At Risk,756,756,100.0,1011207.33,100.0,1337.58,5.92
+Hibernating,1515,1515,100.0,618885.97,100.0,408.51,3.62
+Can't Lose,73,73,100.0,580961.6,100.0,7958.38,3.4
+Need Attention,269,10,3.72,46205.46,13.73,4620.55,0.27
+Loyal Customers,1157,19,1.64,34836.4,0.75,1833.49,0.2
+About To Sleep,382,14,3.66,3363.97,1.64,240.28,0.02
+Champions,830,0,0.0,0.0,0.0,0.0,0.0
+New Customers,54,0,0.0,0.0,0.0,0.0,0.0
+Potential Loyalists,711,0,0.0,0.0,0.0,0.0,0.0
+Promising,114,0,0.0,0.0,0.0,0.0,0.0
