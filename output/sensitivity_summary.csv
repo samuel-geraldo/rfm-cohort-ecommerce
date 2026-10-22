@@ -1,0 +1,6 @@
+Skenario,Persen_customer_pindah_segmen,Persen_customer_R_berubah,Persen_customer_F_berubah,Persen_monetary_pindah_segmen,Persen_revenue_Champions,Selisih_revenue_Champions_vs_baseline
+tie-break acak (rata-rata 200x),8.97,0.73,22.3,2.84,51.55,0.03
+tie-break acak (terburuk),9.69,0.75,22.9,3.16,51.5,-0.02
+nilai sama satu skor (rank min),6.67,0.96,15.94,2.11,51.76,0.24
+nilai sama satu skor (rank max),15.48,0.85,39.24,4.69,51.71,0.19
+ambang tetap (bisnis),17.16,25.49,18.58,12.45,60.13,8.61

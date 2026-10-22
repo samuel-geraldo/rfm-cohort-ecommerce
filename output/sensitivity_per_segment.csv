@@ -1,0 +1,6 @@
+Skenario,About To Sleep,At Risk,Can't Lose,Champions,Hibernating,Loyal Customers,Need Attention,New Customers,Potential Loyalists,Promising
+tie-break acak (rata-rata),91.31,86.83,93.85,97.47,94.05,94.12,77.06,70.0,86.12,71.43
+tie-break acak (terburuk),87.43,85.45,90.41,96.51,92.74,93.17,73.23,46.3,83.83,61.4
+nilai sama satu skor (rank min),100.0,83.73,90.41,97.11,99.93,89.46,85.13,100.0,90.01,97.37
+nilai sama satu skor (rank max),64.14,97.49,100.0,98.8,75.25,99.74,71.75,0.0,83.26,0.0
+ambang tetap (bisnis),47.38,83.86,80.82,97.11,100.0,66.46,45.72,100.0,90.01,64.91
