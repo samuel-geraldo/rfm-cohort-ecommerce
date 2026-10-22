@@ -167,13 +167,13 @@ function rollsSvg(K, P, rolls, z0, r, seamStep, lit) {
     const h = Math.max(roll.h, 0.08);
     let seams = "";
     for (let z = z0 + seamStep; z < z0 + h - 0.3; z += seamStep) seams += K.lineSvg(K.sideArc(roll.cx, roll.cy, r, z, P, 40), { tone: "faint" });
-    out += K.solidSvg(K.cylinder(roll.cx, roll.cy, r, z0, h, P, 40), { tone: "hi", lit, inner: seams }) + K.lineSvg(K.ring(roll.cx, roll.cy, r - 0.75, z0 + h, P, 32), { tone: "faint" });
+    out += K.solidSvg(K.cylinder(roll.cx, roll.cy, r, z0, h, P, 40), { tone: "hi", lit, inner: seams, className: "rf-roll" }) + K.lineSvg(K.ring(roll.cx, roll.cy, r - 0.75, z0 + h, P, 32), { tone: "faint" });
   }
   return out;
 }
 
 function tokenSvg(K, P, cx, cy, z, lit) {
-  return K.solidSvg(K.cylinder(cx, cy, 3, z, 1.4, P, 32, 0.3), { tone: "hi", lit }) + K.lineSvg(K.ring(cx, cy, 2, z + 1.4, P, 24), { tone: "lo" });
+  return K.solidSvg(K.cylinder(cx, cy, 3, z, 1.4, P, 32, 0.3), { tone: "hi", lit, className: "rf-token" }) + K.lineSvg(K.ring(cx, cy, 2, z + 1.4, P, 24), { tone: "lo" });
 }
 
 // Isi magasin: batang dorong, pelat, lalu n token; token teratas selalu di muka kutub magnet.
@@ -689,7 +689,22 @@ const svg = k.figureSvg({ width: WIDTH, height: HEIGHT, label: LABEL, body: page
 
 const EXTRA_CSS = `
 .seg-floor{fill:transparent;stroke:var(--anatomy-faint);stroke-width:var(--anatomy-weight);transition:fill .35s var(--anatomy-ease),stroke .35s var(--anatomy-ease)}
-.seg-floor[data-on]{fill:var(--anatomy-shade-2);stroke:var(--anatomy-hi)}
+.seg-floor[data-on]{fill:var(--rf-aksen);fill-opacity:.2;stroke:var(--rf-aksen)}
+.iso{--rf-aksen:#3fc1c9;--rf-koin-0:#7a5a12;--rf-koin-1:#946d16;--rf-koin-2:#ad8219;--rf-koin-3:#c79a1f;--rf-koin-top:#e8bd3a;--rf-koin-tepi:#f2cf6a;--rf-koin-lit-top:#ffdf70;--rf-koin-lit-shade:#d9ab2a}
+.iso[data-theme="light"]{--rf-aksen:#0e7c86;--rf-koin-0:#a87908;--rf-koin-1:#c08f10;--rf-koin-2:#d6a420;--rf-koin-3:#e5b83a;--rf-koin-top:#f4cf5a;--rf-koin-tepi:#7a5605;--rf-koin-lit-top:#ffe070;--rf-koin-lit-shade:#e0b030}
+.iso-solid.rf-roll>.iso-fill{fill:var(--rf-koin-1)}
+.iso-solid.rf-roll>.iso-shade[data-shade="0"]{fill:var(--rf-koin-0)}
+.iso-solid.rf-roll>.iso-shade[data-shade="1"]{fill:var(--rf-koin-1)}
+.iso-solid.rf-roll>.iso-shade[data-shade="2"]{fill:var(--rf-koin-2)}
+.iso-solid.rf-roll>.iso-shade[data-shade="3"]{fill:var(--rf-koin-3)}
+.iso-solid.rf-roll>.iso-top{fill:var(--rf-koin-top)}
+.iso-solid.rf-roll[data-lit]>.iso-top{fill:var(--rf-koin-lit-top)}
+.iso-solid.rf-roll[data-lit]>.iso-shade{fill:var(--rf-koin-lit-shade)}
+.iso-solid.rf-roll>.iso-edge,.iso-solid.rf-roll[data-lit]>.iso-edge{stroke:var(--rf-koin-tepi)}
+.iso-solid.rf-roll .iso-line[data-tone="faint"]{stroke:var(--rf-koin-0)}
+.iso-solid.rf-token>.iso-fill,.iso-solid.rf-token>.iso-top{fill:var(--rf-aksen)}
+.iso-solid.rf-token>.iso-shade{fill:var(--rf-aksen);fill-opacity:.7}
+.iso-solid.rf-token>.iso-edge{stroke:var(--rf-aksen)}
 [data-part="token"]{transition:opacity .3s var(--anatomy-ease)}
 @media (prefers-reduced-motion:reduce){.seg-floor,[data-part="token"]{transition:none}}
 `;
@@ -711,8 +726,8 @@ const PAGE_CSS = `
 .rf-run p{margin:0;color:var(--anatomy-muted);font-family:var(--anatomy-mono);font-size:11.5px}
 .rf-board[data-board="ex"]{margin-top:10px}
 .rf-board[data-board="ex"]>div[data-wait] b,.rf-board[data-board="ex"]>div[data-wait] i{color:var(--anatomy-lo)}
-.iso-swatch[data-mark="roll"] path{fill:var(--anatomy-card);stroke:var(--anatomy-hi)}
-.iso-swatch[data-mark="box"] path{fill:var(--anatomy-shade-2);stroke:var(--anatomy-hi)}
+.iso-swatch[data-mark="roll"] path{fill:var(--rf-koin-3);stroke:var(--rf-koin-tepi)}
+.iso-swatch[data-mark="box"] path{fill:var(--rf-aksen);fill-opacity:.2;stroke:var(--rf-aksen)}
 .rf-intro{color:var(--anatomy-text);margin:0 0 18px}
 .rf-intro h1{color:var(--anatomy-strong);font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
 .rf-intro p{margin:0}
