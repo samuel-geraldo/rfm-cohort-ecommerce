@@ -5,9 +5,9 @@ Sumber figur interaktif di `docs/rfm/index.html` (GitHub Pages) dan preview `doc
 Semua angka dibaca dari `output/figur/rfm_segments.json`, jadi urutannya:
 
 ```bash
-python src/export_figure_data.py            # ringkasan segmen dari output/rfm_table.csv
-node figures/rfm/build.mjs                  # halaman + SVG (Node 18+)
-node figures/rfm/build.mjs --audit          # opsional: cek urutan gambar & tumpuan di tiap pose gerak (beberapa menit)
+python src/08_export_figur.py            # ringkasan segmen dari output/rfm_table.csv
+node src/figur_rfm/build.mjs                  # halaman + SVG (Node 20.10+)
+node src/figur_rfm/build.mjs --audit          # opsional: cek urutan gambar & tumpuan di tiap pose gerak (beberapa menit)
 ```
 
 PNG preview diambil dari SVG dengan screenshot headless Chrome (skrip `capture.mjs` dari Anatomy).

@@ -1,5 +1,5 @@
 """
-export_figure_data.py
+08_export_figur.py
 
 Baca output/rfm_table.csv (hasil 02_rfm.py) lalu simpan ringkasan per segmen
 ke output/figur/rfm_segments.json. File ini satu-satunya sumber angka untuk
@@ -15,7 +15,7 @@ Isi JSON:
               mentah (batas quintile yang sebenarnya).
 - examples  : 10 contoh customer (satu per segmen), ID asli diganti nomor urut.
 
-Dijalankan dari root repo: python src/export_figure_data.py
+Dijalankan dari root repo: python src/08_export_figur.py
 """
 
 import json

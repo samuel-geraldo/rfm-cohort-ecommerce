@@ -160,7 +160,7 @@ Paket ini dibangun otomatis oleh `src/07_powerbi_data.py` dari file di `output/`
 Isinya data siap impor, measure DAX, dan tema warna. Visualnya disusun di Power BI
 Desktop (sekitar 20 sampai 30 menit), lalu disimpan sebagai
 `dashboard/customer_analytics.pbix`. Tampilan acuannya ada di
-[`preview-0-pengantar.png`](../preview-0-pengantar.png), [`preview-1-ringkasan.png`](../preview-1-ringkasan.png), [`preview-2-segmen.png`](../preview-2-segmen.png), dan [`preview-3-cohort.png`](../preview-3-cohort.png) di `dashboard/`.
+[`preview-0-pengantar.png`](../preview/preview-0-pengantar.png), [`preview-1-ringkasan.png`](../preview/preview-1-ringkasan.png), [`preview-2-segmen.png`](../preview/preview-2-segmen.png), dan [`preview-3-cohort.png`](../preview/preview-3-cohort.png) di `dashboard/`.
 
 > Measure DAX di sini belum diuji di Power BI Desktop. Gunakan angka acuan di
 > bagian bawah untuk memeriksanya setelah dibuat.
