@@ -319,19 +319,19 @@ untuk grouping bulan.
 
 **Mulai di sini: apa itu RFM dan cohort**
 
-![Dashboard halaman pembuka](dashboard/preview-0-pengantar.png)
+![Dashboard halaman pembuka](dashboard/preview/preview-0-pengantar.png)
 
 **Halaman 1: Ringkasan**
 
-![Dashboard halaman ringkasan](dashboard/preview-1-ringkasan.png)
+![Dashboard halaman ringkasan](dashboard/preview/preview-1-ringkasan.png)
 
 **Halaman 2: Segmen dan wilayah**
 
-![Dashboard halaman segmen dan wilayah](dashboard/preview-2-segmen.png)
+![Dashboard halaman segmen dan wilayah](dashboard/preview/preview-2-segmen.png)
 
 **Halaman 3: Cohort retention**
 
-![Dashboard halaman cohort retention](dashboard/preview-3-cohort.png)
+![Dashboard halaman cohort retention](dashboard/preview/preview-3-cohort.png)
 
 Dua keluaran, keduanya dibangun dari file di `output/` tanpa data mentah:
 
@@ -367,7 +367,7 @@ rfm-cohort-ecommerce/
 │   ├── 05_export_figures.py      # export chart ke PNG
 │   ├── 06_dashboard.py           # dashboard interaktif (HTML)
 │   ├── 07_powerbi_data.py        # paket impor Power BI
-│   ├── export_figure_data.py     # angka untuk figur RFM (output/figur/)
+│   ├── 08_export_figur.py     # angka untuk figur RFM (output/figur/)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
 │   ├── buat_database.py          # muat parquet ke SQLite
@@ -390,7 +390,7 @@ rfm-cohort-ecommerce/
 ├── docs/
 │   ├── bugs.md
 │   └── rfm/                      # figur interaktif segmentasi RFM (GitHub Pages)
-├── figures/rfm/                  # sumber build figur RFM (kit Anatomy, MIT)
+├── src/figur_rfm/                  # sumber build figur RFM (kit Anatomy, MIT)
 ├── index.html                 # mengarahkan alamat utama GitHub Pages ke dashboard
 ├── requirements.txt
 └── LICENSE                    # MIT (kode)
@@ -452,8 +452,8 @@ jupyter notebook notebooks/analisis_lanjutan.ipynb
 **7. Bangun figur RFM** (opsional, butuh Node 20.10+; hanya membaca `output/rfm_table.csv`)
 
 ```bash
-python src/export_figure_data.py   # output/figur/rfm_segments.json
-node figures/rfm/build.mjs         # docs/rfm/index.html dan rfm-figure.svg
+python src/08_export_figur.py   # output/figur/rfm_segments.json
+node src/figur_rfm/build.mjs         # docs/rfm/index.html dan rfm-figure.svg
 ```
 
 Semua script membaca dan menulis lewat path relatif tetap, jadi harus

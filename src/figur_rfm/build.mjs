@@ -1,11 +1,11 @@
 // Figur interaktif "cara kerja segmentasi RFM": mesin sortir customer di atas laci tipe-case.
 //
-// Semua angka dibaca dari output/figur/rfm_segments.json (hasil src/export_figure_data.py):
+// Semua angka dibaca dari output/figur/rfm_segments.json (hasil src/08_export_figur.py):
 // luas tiap sel laci = jumlah customer di kombinasi skor R x F itu, jumlah gulungan koin =
 // revenue segmen (satu gulungan penuh = £1 juta), dan 10 token di magasin = 10 contoh customer (satu per segmen).
 //
-//   node figures/rfm/build.mjs           -> docs/rfm/index.html + docs/rfm/rfm-figure.svg
-//   node figures/rfm/build.mjs --audit   -> juga cek urutan gambar & tumpuan di banyak pose (kit/audit.mjs)
+//   node src/figur_rfm/build.mjs           -> docs/rfm/index.html + docs/rfm/rfm-figure.svg
+//   node src/figur_rfm/build.mjs --audit   -> juga cek urutan gambar & tumpuan di banyak pose (kit/audit.mjs)
 //
 // kit/ adalah Anatomy (MIT, lihat LICENSE-anatomy).
 
@@ -784,7 +784,7 @@ const plate = k
   .replace("</figure>", `<figcaption class="iso-legend"><span class="iso-keys">${legendKeys}</span><span class="iso-caption">${caption}</span></figcaption></figure>`);
 
 const intro = `<header class="rf-intro"><h1>Cara kerja segmentasi RFM</h1><p>Tiap customer diukur tiga kali: seberapa baru terakhir belanja (Recency), seberapa sering (Frequency), dan seberapa besar totalnya (Monetary). Tiap ukuran diubah menjadi skor 1–5 menurut quintile, lalu kombinasi skor R dan F menentukan segmen. Hasilnya: segmen kecil bisa membawa sebagian besar revenue.</p></header>`;
-const foot = `<p class="rf-foot">Angka: ${fmtInt(META.total_customers)} customer Online Retail II (UCI), snapshot ${META.snapshot_date}, dari <a href="https://github.com/samuel-geraldo/rfm-cohort-ecommerce/blob/master/output/figur/rfm_segments.json">output/figur/rfm_segments.json</a> (dibuat oleh src/export_figure_data.py dari output/rfm_table.csv). Figur dibuat dengan kit Anatomy (MIT).</p><p class="rf-sr" data-live aria-live="polite"></p>`;
+const foot = `<p class="rf-foot">Angka: ${fmtInt(META.total_customers)} customer Online Retail II (UCI), snapshot ${META.snapshot_date}, dari <a href="https://github.com/samuel-geraldo/rfm-cohort-ecommerce/blob/master/output/figur/rfm_segments.json">output/figur/rfm_segments.json</a> (dibuat oleh src/08_export_figur.py dari output/rfm_table.csv). Figur dibuat dengan kit Anatomy (MIT).</p><p class="rf-sr" data-live aria-live="polite"></p>`;
 
 const PAGE_DATA = {
   P,
