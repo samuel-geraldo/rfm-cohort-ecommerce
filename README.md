@@ -114,6 +114,16 @@ bukan jumlah baris item), dan Monetary (total revenue) dihitung per
 pelanggan, lalu masing-masing diberi skor 1–5 berbasis quintile. Segment
 dipetakan dari kombinasi skor R dan F.
 
+[![Figur interaktif cara kerja segmentasi RFM](docs/rfm/rfm-figure.png)](https://samuel-geraldo.github.io/rfm-cohort-ecommerce/docs/rfm/)
+
+Laci di figur adalah peta skor R × F: tiap sel mewakili satu kombinasi skor,
+luasnya sebanding jumlah pelanggan, dan sekat mengelompokkan sel menjadi 10
+segmen. Gulungan koin menunjukkan revenue (satu gulungan penuh = £1 juta),
+jadi kotak Champions yang berukuran sedang penuh uang, sedangkan Hibernating
+yang kotaknya paling luas hampir kosong. Klik gambar untuk versi interaktif:
+pilih segmen, atau jalankan salah satu dari 5 contoh pelanggan melewati
+gerbang R, F, M sampai jatuh ke selnya.
+
 ### Cohort Analysis
 
 Pelanggan dikelompokkan berdasarkan bulan transaksi pertamanya, lalu dihitung
@@ -357,6 +367,7 @@ rfm-cohort-ecommerce/
 │   ├── 05_export_figures.py      # export chart ke PNG
 │   ├── 06_dashboard.py           # dashboard interaktif (HTML)
 │   ├── 07_powerbi_data.py        # paket impor Power BI
+│   ├── export_figure_data.py     # angka untuk figur RFM (output/figur/)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
 │   ├── buat_database.py          # muat parquet ke SQLite
@@ -373,9 +384,13 @@ rfm-cohort-ecommerce/
 │   ├── cohort_matrix.csv
 │   ├── churn_summary.csv
 │   ├── segment_summary.csv
+│   ├── figur/rfm_segments.json   # ringkasan segmen untuk figur RFM
 │   └── figures/
 ├── notebooks/analisis_lanjutan.ipynb
-├── docs/bugs.md
+├── docs/
+│   ├── bugs.md
+│   └── rfm/                      # figur interaktif segmentasi RFM (GitHub Pages)
+├── figures/rfm/                  # sumber build figur RFM (kit Anatomy, MIT)
 ├── index.html                 # mengarahkan alamat utama GitHub Pages ke dashboard
 ├── requirements.txt
 └── LICENSE                    # MIT (kode)
@@ -432,6 +447,13 @@ python src/07_powerbi_data.py    # dashboard/powerbi/
 
 ```bash
 jupyter notebook notebooks/analisis_lanjutan.ipynb
+```
+
+**7. Bangun figur RFM** (opsional, butuh Node 20.10+; hanya membaca `output/rfm_table.csv`)
+
+```bash
+python src/export_figure_data.py   # output/figur/rfm_segments.json
+node figures/rfm/build.mjs         # docs/rfm/index.html dan rfm-figure.svg
 ```
 
 Semua script membaca dan menulis lewat path relatif tetap, jadi harus
