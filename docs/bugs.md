@@ -77,3 +77,12 @@ Setiap bug nyata yang ditemukan selama pengerjaan dicatat di sini dengan format:
   README/Power BI); `sql/queries.sql` tetap berguna sebagai validasi
   independen atas Recency/Frequency/Monetary mentah (yang cocok 100%), dan
   sebagai demonstrasi teknik `NTILE()` window function.
+- **Catatan setelah migrasi ke PostgreSQL (10 Nov 2026):** angka di atas
+  (76.22%, 1,394 customer) diukur saat database masih SQLite. Setelah
+  dipindah ke PostgreSQL, perbandingan diulang terhadap `output/rfm_table.csv`:
+  F_score cocok 76.86% (1,356 dari 5,861 customer beda, semua tetap ±1),
+  R_score cocok 99.25% (44 beda), M_score cocok 100%. Dibandingkan langsung
+  dengan hasil SQLite, 932 customer berbeda skor F dan 42 berbeda skor R,
+  semuanya ±1 dan semuanya customer yang nilai Frequency atau Recency-nya
+  kembar dengan customer lain. Tidak ada selisih pada customer bernilai
+  unik, jadi ini murni urutan tie-break `NTILE`, bukan salah porting.

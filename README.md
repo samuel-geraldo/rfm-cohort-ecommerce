@@ -5,7 +5,7 @@ Desember 2009 – Desember 2011: siapa pelanggan yang paling bernilai, berapa
 banyak yang bertahan setelah pembelian pertama, dan apa yang membedakan
 pelanggan yang berhenti dari yang masih aktif.
 
-**Stack:** Python (pandas, matplotlib, seaborn, scipy) · SQL/SQLite · Jupyter
+**Stack:** Python (pandas, matplotlib, seaborn, scipy) · SQL/PostgreSQL · Jupyter
 
 **Dashboard interaktif:** [buka di browser](https://samuel-geraldo.github.io/rfm-cohort-ecommerce/) (empat halaman, filter wilayah dan status churn).
 
@@ -355,12 +355,19 @@ untuk data dengan tie sebanyak ini, dan tidak ada satu urutan tie-break yang
 "benar". Yang penting diverifikasi adalah selisihnya selalu ±1, bukan lebih.
 `output/rfm_table.csv` dipakai sebagai sumber kebenaran untuk Segment.
 
+Angka 23,78% dan 1.394 pelanggan di atas diukur saat database masih SQLite.
+Setelah dipindah ke PostgreSQL, perbandingan diulang: F_score berbeda di 1.356
+dari 5.861 pelanggan (23,14%), tetap selisih tepat ±1 dan hanya pada pelanggan
+dengan Frequency kembar. R_score berbeda di 44 pelanggan (99,25% cocok), M_score
+cocok 100%. Angkanya sedikit bergeser karena urutan tie-break PostgreSQL berbeda
+dari SQLite.
+
 ---
 
 ## SQL
 
 [`sql/queries.sql`](sql/queries.sql) menghitung ulang metrik utama langsung
-dari tabel `transactions` di SQLite — bukan mengimpor CSV hasil Python —
+dari tabel `transactions` di PostgreSQL — bukan mengimpor CSV hasil Python —
 sehingga berfungsi sebagai validasi silang yang independen.
 
 | Query | Teknik |
@@ -370,9 +377,18 @@ sehingga berfungsi sebagai validasi silang yang independen.
 | 3. Rata-rata monetary per cohort | CTE bertingkat |
 | 4. Interval dari order pertama | Self-join |
 
-SQLite tidak punya tipe date native, jadi `InvoiceDate` disimpan sebagai TEXT
-ISO dan diolah lewat `julianday()` untuk selisih tanggal dan `strftime()`
-untuk grouping bulan.
+`InvoiceDate` disimpan sebagai `TIMESTAMP` asli. Selisih hari dihitung dari
+selisih detik dibagi 86.400 lalu dipotong (`TRUNC`), bukan dari pengurangan
+tanggal langsung: pengurangan tanggal menghitung selisih hari kalender dan bisa
+berbeda satu hari dari selisih sebenarnya. Grouping bulan memakai `to_char()`,
+dan `ROUND(x, 2)` butuh cast ke `NUMERIC` di PostgreSQL.
+
+Database ini sebelumnya SQLite. Setelah dipindah ke PostgreSQL, hasil keempat
+query dicocokkan dengan versi SQLite: query 2, 3, dan 4 identik sel demi sel.
+Pada query 1, Recency, Frequency, dan Monetary identik untuk semua 5.861
+pelanggan, sedangkan skor `NTILE` berbeda ±1 pada pelanggan yang nilainya
+kembar (R_score 42 pelanggan, F_score 932 pelanggan) — efek urutan tie-break
+yang dibahas di bug ketiga, bukan salah porting.
 
 ---
 
@@ -436,7 +452,7 @@ rfm-cohort-ecommerce/
 │   ├── figur_rfm/                # sumber build figur RFM (kit Anatomy, MIT)
 │   └── dashboard_template.html   # template untuk 06_dashboard.py
 ├── sql/
-│   ├── buat_database.py          # muat parquet ke SQLite
+│   ├── buat_database.py          # muat parquet ke PostgreSQL
 │   └── queries.sql               # NTILE, LAG, CTE bertingkat, self-join
 ├── dashboard/
 │   ├── customer_analytics.html
@@ -496,11 +512,25 @@ python src/09_churn_segmen.py    # churn per segmen RFM, butuh hasil 04
 python src/10_sensitivitas.py    # uji sensitivitas skor RFM, butuh hasil 02
 ```
 
-**4. Bangun database SQLite dan jalankan query**
+**4. Siapkan PostgreSQL, bangun database, dan jalankan query**
+
+Butuh PostgreSQL 17 atau lebih baru yang berjalan di komputer sendiri (paket
+Python-nya, `psycopg`, sudah ikut di `requirements.txt`). Buat database kosong
+bernama `retail`. Kredensial tidak disimpan di repo: koneksi dibaca dari
+environment variable standar PostgreSQL. Nilai bawaan kalau tidak diisi:
+`PGHOST=localhost`, `PGPORT=5432`, `PGDATABASE=retail`, `PGUSER=postgres`.
+Hanya kata sandi yang perlu kamu isi sendiri (atau pakai file `pgpass`).
 
 ```bash
+createdb -U postgres retail
+
+# Windows (Command Prompt)
+set PGPASSWORD=<kata_sandi_postgres_kamu>
+# macOS / Linux
+# export PGPASSWORD=<kata_sandi_postgres_kamu>
+
 python sql/buat_database.py
-sqlite3 sql/retail.db < sql/queries.sql
+psql -U postgres -h localhost -d retail -f sql/queries.sql
 ```
 
 **5. Bangun dashboard** (tidak butuh data mentah, hanya file di `output/`)
