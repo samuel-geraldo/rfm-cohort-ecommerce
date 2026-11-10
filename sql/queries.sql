@@ -1,11 +1,14 @@
--- Kumpulan query analisis di atas tabel transactions (sql/retail.db, dibuat
--- oleh buat_database.py). Semuanya dihitung ulang langsung dari transactions
--- (bukan diimpor dari CSV hasil src/*.py) supaya jadi validasi silang
--- terhadap hasil Python.
+-- Kumpulan query analisis di atas tabel transactions (database PostgreSQL
+-- "retail", dibuat oleh buat_database.py). Semuanya dihitung ulang langsung
+-- dari transactions (bukan diimpor dari CSV hasil src/*.py) supaya jadi
+-- validasi silang terhadap hasil Python.
 --
--- SQLite tidak punya tipe date native -> InvoiceDate disimpan sebagai TEXT
--- ISO, dipakai lewat julianday() (selisih tanggal) dan strftime() (grouping
--- bulan).
+-- InvoiceDate bertipe TIMESTAMP asli. Selisih hari dihitung dari selisih
+-- detik dibagi 86.400 lalu dipotong ke bilangan bulat (TRUNC), bukan dari
+-- pengurangan tanggal kalender: pengurangan tanggal menghitung selisih hari
+-- kalender dan bisa beda satu hari dari selisih sebenarnya (mis. 08:00 hari
+-- pertama ke 07:00 hari berikutnya = 0 hari, bukan 1). Grouping bulan
+-- memakai to_char().
 
 -- ============================================================================
 -- Query 1: Skor RFM per customer pakai NTILE(5) OVER (ORDER BY ...).
@@ -14,7 +17,9 @@
 WITH customer_rfm AS (
     SELECT
         CustomerID,
-        CAST(julianday('2011-12-10') - julianday(MAX(InvoiceDate)) AS INTEGER) AS Recency,
+        TRUNC(
+            EXTRACT(EPOCH FROM (TIMESTAMP '2011-12-10' - MAX(InvoiceDate))) / 86400
+        )::INTEGER AS Recency,
         COUNT(DISTINCT Invoice) AS Frequency,
         SUM(Revenue) AS Monetary
     FROM transactions
@@ -55,11 +60,12 @@ SELECT
     Invoice,
     order_date,
     LAG(order_date) OVER (PARTITION BY CustomerID ORDER BY order_date) AS order_sebelumnya,
-    CAST(
-        julianday(order_date)
-        - julianday(LAG(order_date) OVER (PARTITION BY CustomerID ORDER BY order_date))
-        AS INTEGER
-    ) AS interval_hari
+    TRUNC(
+        EXTRACT(EPOCH FROM (
+            order_date
+            - LAG(order_date) OVER (PARTITION BY CustomerID ORDER BY order_date)
+        )) / 86400
+    )::INTEGER AS interval_hari
 FROM customer_orders
 ORDER BY CustomerID, order_date
 LIMIT 30;
@@ -82,15 +88,16 @@ customer_cohort AS (
     -- CTE tingkat 2: cohort_month = bulan transaksi pertama tiap customer.
     SELECT
         CustomerID,
-        strftime('%Y-%m', MIN(InvoiceDate)) AS cohort_month
+        to_char(MIN(InvoiceDate), 'YYYY-MM') AS cohort_month
     FROM transactions
     GROUP BY CustomerID
 )
 -- CTE tingkat 3 (final): join keduanya, rata-rata Monetary per cohort_month.
+-- ROUND(x, 2) di PostgreSQL hanya ada untuk tipe numeric, jadi AVG di-cast.
 SELECT
     cc.cohort_month,
     COUNT(*) AS jumlah_customer,
-    ROUND(AVG(cm.Monetary), 2) AS rata2_monetary
+    ROUND(AVG(cm.Monetary)::NUMERIC, 2) AS rata2_monetary
 FROM customer_monetary AS cm
 JOIN customer_cohort AS cc ON cc.CustomerID = cm.CustomerID
 GROUP BY cc.cohort_month
@@ -124,10 +131,9 @@ SELECT
     order_pertama.first_order_date,
     berikutnya.Invoice AS invoice_berikutnya,
     berikutnya.order_date AS tanggal_order_berikutnya,
-    CAST(
-        julianday(berikutnya.order_date) - julianday(order_pertama.first_order_date)
-        AS INTEGER
-    ) AS interval_hari_dari_order_pertama
+    TRUNC(
+        EXTRACT(EPOCH FROM (berikutnya.order_date - order_pertama.first_order_date)) / 86400
+    )::INTEGER AS interval_hari_dari_order_pertama
 FROM customer_orders AS berikutnya
 JOIN order_pertama ON order_pertama.CustomerID = berikutnya.CustomerID
 WHERE berikutnya.order_date > order_pertama.first_order_date
